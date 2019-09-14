@@ -1,0 +1,16 @@
+Todo:
+
+- refactor the queue items as node and states
+- min heap 
+- Efficient string concat https://waymoot.org/home/python_string/
+
+>>> x
+[[2, 3], [3, 6]]
+>>> x = [list(map(str, i)) for i in x]
+>>> x
+[['2', '3'], ['3', '6']]
+>>> [','.join(i) for i in x]
+['2,3', '3,6']
+>>> ' '.join([','.join(i) for i in x])
+'2,3 3,6'
+>>> 
