@@ -1,1 +1,1 @@
-heuristic
+temp_explored

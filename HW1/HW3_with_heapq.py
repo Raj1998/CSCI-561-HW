@@ -1,6 +1,6 @@
 import queue
 from math import sqrt
-
+import heapq
 
 class Node():
     def __init__(self, val, elev, parent, depth, g, h,children):
@@ -54,7 +54,7 @@ def heuristic(x, y, target_x, target_y):
     if algo == "ucs":
         return 0
     else:
-        manhattan_dist = abs(x-target_x) + abs(y-target_y)
+        # manhattan_dist = abs(x-target_x) + abs(y-target_y)
         straight_line_dist = sqrt(abs(x-target_x)**2 + abs(y-target_y)**2)
         elev_diff = abs(surface[y][x] - surface[target_y][target_x])
         return straight_line_dist + elev_diff
@@ -191,44 +191,59 @@ elif algo == "ucs" or algo == "a*":
             []
         )
 
-        q = queue.PriorityQueue()
-        q.put(start_node)
-        visited = set()
+        # q = queue.PriorityQueue()
+        q = []
+        # hmap = {}
+
+        # q.put(start_node)
+        heapq.heappush(q, start_node)
+        visited = {}
 
         temp_explored = []
 
         foundNode = None
-        while not q.empty():
+        while q:
             # print(q.queue)
-            curr_node = q.get()
+            curr_node = heapq.heappop(q)
             curr_x, curr_y = curr_node.val
             temp_explored.append(curr_node.val)
             # print(curr_node.val)
 
-            if curr_node.val not in visited:
-                visited.add(curr_node.val)
+            # if curr_node.val not in visited:
+            #     visited.add(curr_node.val)
                 
-                if curr_x == target_x and curr_y == target_y:
-                    print('path exist')
-                    foundNode = curr_node
-                    break
-                    # !!!! how to get reference of that node?
-                
-                get_chidlren_usc_astart(curr_node, w, h, target_x, target_y)
+            if curr_x == target_x and curr_y == target_y:
+                print('path exist')
+                foundNode = curr_node
+                break
+                # !!!! how to get reference of that node?
+            
+            get_chidlren_usc_astart(curr_node, w, h, target_x, target_y)
 
-                for child in curr_node.children:
-                    if abs(curr_node.elev - child.elev) <= max_elev:
-                        q.put(child)
-                        # if path doesnt exist there is no way to 
-                        # terminate the code
+            for child in curr_node.children:
+                if abs(curr_node.elev - child.elev) <= max_elev:
+                    if child.val in visited:
+                        existing_child = visited[child.val]
+                        if existing_child.g+existing_child.h > child.g+child.h:
+                            visited[child.val].parent = child.parent
+                            visited[child.val].depth = child.depth
+                            visited[child.val].g = child.g
+                            visited[child.val].h = child.h
+                            
+                            # heapq.heapify(q)
+                    else:
+                        visited[child.val] = child
+                        heapq.heappush(q, child)
+                    
+                    # if path doesnt exist there is no way to 
+                    # terminate the code
             
         if not foundNode:
-            # print(q.qsize)
             print('path doesnt exist')
         else:
             tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
-
-            print(q.qsize())
+            
+            print(len(q))
             tempMap[foundNode.val[1]][foundNode.val[0]] = '*'
             pathNode = foundNode.parent
             while pathNode:
@@ -245,4 +260,3 @@ elif algo == "ucs" or algo == "a*":
             print('--------')
             for ro in tempMap:
                 print('  '.join(ro))
-        
