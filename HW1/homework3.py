@@ -1,5 +1,6 @@
 import queue
 from math import sqrt
+import os
 
 class Node():
     def __init__(self, val, elev, parent, depth, g, h,children):
@@ -16,7 +17,7 @@ class Node():
 
     def __lt__(self, other):
         return (self.g + self.h) < (other.g + other.h)
-
+# print(os.listdir())
 with open('input4.txt', 'r') as f:
     line = f.readline()
     arr = [0]
@@ -24,7 +25,7 @@ with open('input4.txt', 'r') as f:
         arr.append(line.replace('\n', ''))
         line = f.readline()
     
-algo = arr[1]
+algo = arr[1].lower()
 
 w, h = list(map(int, arr[2].split()))
 x, y = list(map(int, arr[3].split()))
@@ -50,7 +51,7 @@ for i in surface:
     print(i)
 
 def heuristic(x, y, target_x, target_y):
-    if algo == "UCS":
+    if algo == "ucs":
         return 0
     else:
         # manhattan_dist = abs(x-target_x) + abs(y-target_y)
@@ -93,27 +94,18 @@ def get_chidlren_usc_astart(parent, w, h, target_x, target_y):
     # x = x
     # y = y
 
-    # if x == y == 0:
-    #     parent.children.append(Node((1, 0), surface[0][1], parent, parent.depth+1, 9999, []))
-    #     parent.children.append(Node((0, 1), surface[1][0], parent, parent.depth+1, 10, []))
-    # elif x == 0 and y == 1:
-    #     parent.children.append(Node((0, 2), surface[2][0], parent, parent.depth+1, 10, []))
-    #     # parent.children.append(Node((0, 1), surface[1][0], parent, parent.depth+1, 10, []))
-    # else:
     for i in range(x-1, x+2):
         for j in range(y-1, y+2):
             if not(i == x and j == y) and (0 <= i < w and 0 <= j < h):
                 newNode = Node((i, j), surface[j][i], parent, parent.depth+1, 0, heuristic(i, j, target_x, target_y), [])
                 if i==x or j==y:
-                    if algo == "UCS":
-                        newNode.g = parent.g + 10
-                    else:
-                        # algo == "A*"
-                        newNode.g = parent.g + 10 + abs(newNode.elev - parent.elev)
+                    newNode.g = parent.g + 10
+                    if algo == "a*":
+                        newNode.g += abs(newNode.elev - parent.elev)
                     parent.children.append(newNode)
                 else:
                     newNode.g = parent.g + 14
-                    if algo == "A*":
+                    if algo == "a*":
                         newNode.g += abs(newNode.elev - parent.elev)
                     parent.children.append(newNode)
 
@@ -135,7 +127,7 @@ def get_chidlren_usc_astart(parent, w, h, target_x, target_y):
 
 
 
-if algo == "BFS":
+if algo == "bfs":
     f = open('output.txt', 'w')
     for idx, sites in enumerate(target_sites):
         a, b = sites
@@ -188,7 +180,7 @@ if algo == "BFS":
         f.write(outputStr)
     f.close()
 
-elif algo == "UCS" or algo == "A*":
+elif algo == "ucs" or algo == "a*":
     for idx, sites in enumerate(target_sites):
         target_x, target_y = sites
         start_node = Node((x, y), surface[y][x], None,
@@ -202,15 +194,19 @@ elif algo == "UCS" or algo == "A*":
         q.put(start_node)
         visited = set()
 
+        temp_explored = []
+
         foundNode = None
         while not q.empty():
             # print(q.queue)
             curr_node = q.get()
             curr_x, curr_y = curr_node.val
+            temp_explored.append(curr_node.val)
             # print(curr_node.val)
 
             if curr_node.val not in visited:
                 visited.add(curr_node.val)
+                
                 if curr_x == target_x and curr_y == target_y:
                     print('path exist')
                     foundNode = curr_node
@@ -226,19 +222,26 @@ elif algo == "UCS" or algo == "A*":
                         # terminate the code
             
         if not foundNode:
+            print(temp_explored)
             print('path doesnt exist')
         else:
             tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
+            print(foundNode.g)
             print(foundNode)
             tempMap[foundNode.val[1]][foundNode.val[0]] = '1'
             pathNode = foundNode.parent
             while pathNode:
                 print(pathNode)
-                tempMap[pathNode.val[1]][pathNode.val[0]] = '1'
+                tempMap[pathNode.val[1]][pathNode.val[0]] = '-'
                 pathNode = pathNode.parent
             
             for ro in tempMap:
                 print('  '.join(ro))
             
-            
+            tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
+            for i in temp_explored:
+                tempMap[i[1]][i[0]] = '-'
+            print('--------')
+            for ro in tempMap:
+                print('  '.join(ro))
         
