@@ -54,7 +54,7 @@ def heuristic(x, y, target_x, target_y):
     if algo == "ucs":
         return 0
     else:
-        manhattan_dist = abs(x-target_x) + abs(y-target_y)
+        # manhattan_dist = abs(x-target_x) + abs(y-target_y)
         straight_line_dist = sqrt(abs(x-target_x)**2 + abs(y-target_y)**2)
         elev_diff = abs(surface[y][x] - surface[target_y][target_x])
         return straight_line_dist + elev_diff

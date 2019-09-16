@@ -1,6 +1,7 @@
 import queue
 from math import sqrt
-import heapq
+import time
+start_time = time.time()
 
 class Node():
     def __init__(self, val, elev, parent, depth, g, h,children):
@@ -42,23 +43,23 @@ for i in range(len(arr)-h, len(arr)):
 # print()
 # print(arr)
 
-print(algo)
-print(w, h)
-print(x, y)
-print(max_elev)
-print(target_sites)
-for i in surface:
-    print(i)
+# print(algo)
+# print(w, h)
+# print(x, y)
+# print(max_elev)
+# print(target_sites)
+# for i in surface:
+#     print(i)
 
 def heuristic(x, y, target_x, target_y):
     if algo == "ucs":
         return 0
     else:
         # manhattan_dist = abs(x-target_x) + abs(y-target_y)
-        straight_line_dist = sqrt(abs(x-target_x)**2 + abs(y-target_y)**2)
+        straight_line_dist = int(sqrt(abs(x-target_x)**2 + abs(y-target_y)**2))
         elev_diff = abs(surface[y][x] - surface[target_y][target_x])
         return straight_line_dist + elev_diff
-        # return manhattan_dist
+        # return manhattan_dist + elev_diff
 
 def getNeighbours(x, y, w, h):
     neighbours = []
@@ -148,7 +149,7 @@ if algo == "bfs":
             curr_x, curr_y = q.get()
             # print(parent)
             if curr_x == a and curr_y == b:
-                print('path exist')
+                # print('path exist')
                 break
             neighbours = getNeighbours(curr_x, curr_y, w, h)
             for n in neighbours:
@@ -163,25 +164,38 @@ if algo == "bfs":
         # print(visited)
         node = (a, b)
         if node not in parent:
-            # fix these shit !!!!!
-            if idx==len(target_sites)-1:
-                outputStr = "FAIL"
-            else:
-                outputStr = "FAIL"
+            f.write("FAIL")
+            # if idx==len(target_sites)-1:
+            #     outputStr = "FAIL"
+            # else:
+            #     outputStr = "FAIL"
         else:
-            outputStr = str(b)+","+str(a)
+            print("q size = ", q.qsize())
+
+            # outputStr = str(b)+","+str(a)
+            # f.write(str(b)+","+str(a))
+            ans_arr = []
+            ans_arr.append(str(a)+","+str(b))
             while node in parent and parent[node]:
                 pn = parent[node]
-                print(pn)
+                # print(pn)
                 node = pn
-                outputStr += " "+str(pn[1])+","+str(pn[0])
-            outputStr = outputStr[::-1]
-            if idx!=len(target_sites)-1:
-                outputStr += "\n"
-        f.write(outputStr)
+                # outputStr += " "+str(pn[1])+","+str(pn[0])
+                ans_arr.append(str(pn[0])+","+str(pn[1]))
+            # outputStr = outputStr[::-1]
+            # if idx!=len(target_sites)-1:
+            #     outputStr += "\n"
+            # print(ans_arr)
+            ans_arr = ans_arr[::-1]
+            f.write(' '.join(ans_arr))
+        # f.write(outputStr)
+            
+        if idx!=len(target_sites)-1:
+            f.write("\n")
     f.close()
 
 elif algo == "ucs" or algo == "a*":
+    f = open('output.txt', 'w')
     for idx, sites in enumerate(target_sites):
         target_x, target_y = sites
         start_node = Node((x, y), surface[y][x], None,
@@ -191,72 +205,72 @@ elif algo == "ucs" or algo == "a*":
             []
         )
 
-        # q = queue.PriorityQueue()
-        q = []
-        # hmap = {}
-
-        # q.put(start_node)
-        heapq.heappush(q, start_node)
-        visited = {}
+        q = queue.PriorityQueue()
+        q.put(start_node)
+        visited = set()
 
         temp_explored = []
 
         foundNode = None
-        while q:
+        while not q.empty():
             # print(q.queue)
-            curr_node = heapq.heappop(q)
+            curr_node = q.get()
             curr_x, curr_y = curr_node.val
             temp_explored.append(curr_node.val)
             # print(curr_node.val)
 
-            # if curr_node.val not in visited:
-            #     visited.add(curr_node.val)
+            if curr_node.val not in visited:
+                visited.add(curr_node.val)
                 
-            if curr_x == target_x and curr_y == target_y:
-                # print('path exist')
-                foundNode = curr_node
-                break
-                # !!!! how to get reference of that node?
-            
-            get_chidlren_usc_astart(curr_node, w, h, target_x, target_y)
+                if curr_x == target_x and curr_y == target_y:
+                    # print('path exist')
+                    foundNode = curr_node
+                    break
+                    # !!!! how to get reference of that node?
+                
+                get_chidlren_usc_astart(curr_node, w, h, target_x, target_y)
 
-            for child in curr_node.children:
-                if abs(curr_node.elev - child.elev) <= max_elev:
-                    if child.val in visited:
-                        existing_child = visited[child.val]
-                        if existing_child.g+existing_child.h > child.g+child.h:
-                            visited[child.val].parent = child.parent
-                            visited[child.val].depth = child.depth
-                            visited[child.val].g = child.g
-                            visited[child.val].h = child.h
-                            
-                            # heapq.heapify(q)
-                    else:
-                        visited[child.val] = child
-                        heapq.heappush(q, child)
-                    
-                    # if path doesnt exist there is no way to 
-                    # terminate the code
+                for child in curr_node.children:
+                    if abs(curr_node.elev - child.elev) <= max_elev:
+                        q.put(child)
+                        # if path doesnt exist there is no way to 
+                        # terminate the code
             
         if not foundNode:
-            print('FAIL')
+            # print(q.qsize)
+            print('path doesnt exist')
         else:
-            tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
-            
-            print("Queue size is", len(q))
-            tempMap[foundNode.val[1]][foundNode.val[0]] = '*'
+            # tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
+
+            print("q size = ",q.qsize())
+            print(foundNode.g+foundNode.h)
+
+            ans_arr = []
+            ans_arr.append(str(target_x)+","+str(target_y))
+
+            # tempMap[foundNode.val[1]][foundNode.val[0]] = '*'
             pathNode = foundNode.parent
             while pathNode:
-                print(pathNode)
-                tempMap[pathNode.val[1]][pathNode.val[0]] = '-'
+                # print(pathNode)
+                # tempMap[pathNode.val[1]][pathNode.val[0]] = '-'
+                ans_arr.append(str(pathNode.val[0])+","+str(pathNode.val[1]))
                 pathNode = pathNode.parent
             
-            for ro in tempMap:
-                print('  '.join(ro))
+            ans_arr = ans_arr[::-1]
+            f.write(' '.join(ans_arr))
+
+            # for ro in tempMap:
+                # print('  '.join(ro))
             
-            tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
-            for i in temp_explored:
-                tempMap[i[1]][i[0]] = '-'
-            print('--------')
-            for ro in tempMap:
-                print('  '.join(ro))
+            # tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
+            # for i in temp_explored:
+            #     tempMap[i[1]][i[0]] = '-'
+            # print('--------')
+            # for ro in tempMap:
+            #     print('  '.join(ro))
+        if idx!=len(target_sites)-1:
+            f.write("\n")
+    f.close()
+            
+        
+print(time.time() - start_time, "seconds")
