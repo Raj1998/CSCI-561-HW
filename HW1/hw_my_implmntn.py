@@ -95,7 +95,7 @@ class Node():
     def __lt__(self, other):
         return (self.g + self.h) < (other.g + other.h)
 
-with open('input4.txt', 'r') as f:
+with open('input.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -327,8 +327,8 @@ elif algo == "ucs" or algo == "a*":
         else:
             # tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
             
-            print("Queue size is", len(q.heap))
-            print(foundNode.g+foundNode.h)
+            # print("Queue size = ", len(q.heap))
+            # print("Cost : ",foundNode.g+foundNode.h)
 
             ans_arr = []
             ans_arr.append(str(target_x)+","+str(target_y))
@@ -357,4 +357,4 @@ elif algo == "ucs" or algo == "a*":
             f.write("\n")
     f.close()
 
-print(time.time() - start_time, "seconds")
+# print(time.time() - start_time, "seconds")
