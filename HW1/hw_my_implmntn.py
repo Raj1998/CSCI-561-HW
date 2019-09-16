@@ -259,6 +259,7 @@ if algo == "bfs":
     f.close()
 
 elif algo == "ucs" or algo == "a*":
+    f = open('output.txt', 'w')
     for idx, sites in enumerate(target_sites):
         target_x, target_y = sites
         start_node = Node((x, y), surface[y][x], None,
@@ -329,13 +330,20 @@ elif algo == "ucs" or algo == "a*":
             print("Queue size is", len(q.heap))
             print(foundNode.g+foundNode.h)
 
+            ans_arr = []
+            ans_arr.append(str(target_x)+","+str(target_y))
+
             # tempMap[foundNode.val[1]][foundNode.val[0]] = '*'
             pathNode = foundNode.parent
-            # while pathNode:
-            #     print(pathNode)
-            #     tempMap[pathNode.val[1]][pathNode.val[0]] = '-'
-            #     pathNode = pathNode.parent
+            while pathNode:
+                # print(pathNode)
+                # tempMap[pathNode.val[1]][pathNode.val[0]] = '-'
+                ans_arr.append(str(pathNode.val[0])+","+str(pathNode.val[1]))
+                pathNode = pathNode.parent
             
+            ans_arr = ans_arr[::-1]
+            f.write(' '.join(ans_arr))
+
             # for ro in tempMap:
             #     print('  '.join(ro))
             
@@ -345,6 +353,8 @@ elif algo == "ucs" or algo == "a*":
             # print('--------')
             # for ro in tempMap:
             #     print('  '.join(ro))
-
+        if idx!=len(target_sites)-1:
+            f.write("\n")
+    f.close()
 
 print(time.time() - start_time, "seconds")
