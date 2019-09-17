@@ -95,7 +95,7 @@ class Node():
     def __lt__(self, other):
         return (self.g + self.h) < (other.g + other.h)
 
-with open('input.txt', 'r') as f:
+with open('input4.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -218,7 +218,9 @@ if algo == "bfs":
         visited.add((x, y))
         parent[(x,y)] = None
 
+        counter = 0
         while True:
+            counter += 1
             if q.empty():
                 # print("path doesnt exist")
                 break
@@ -235,7 +237,7 @@ if algo == "bfs":
                     q.put([this_x, this_y])
                     parent[(this_x, this_y)] = (curr_x, curr_y)
                     visited.add((this_x, this_y))
-            
+        print("Looped ", counter, "times")  
 
         # print(visited)
         node = (a, b)
@@ -279,11 +281,14 @@ elif algo == "ucs" or algo == "a*":
         q.insert(start_node)
 
         visited = {}
+        # expolored = {}
 
         # temp_explored = []
 
         foundNode = None
+        counter = 0
         while q:
+            counter+=1
             # print(q.queue)
             curr_node = q.remove()
             curr_x, curr_y = curr_node.val
@@ -291,13 +296,16 @@ elif algo == "ucs" or algo == "a*":
             # print(curr_node.val)
 
             # if curr_node.val not in visited:
-            #     visited.add(curr_node.val)
+            
                 
             if curr_x == target_x and curr_y == target_y:
                 # print('path exist')
                 foundNode = curr_node
                 break
-                # !!!! how to get reference of that node?
+            
+            visited[curr_node.val] = curr_node
+            # expolored[curr_node.val] = curr_node
+
             
             get_chidlren_usc_astart(curr_node, w, h, target_x, target_y)
 
@@ -313,7 +321,7 @@ elif algo == "ucs" or algo == "a*":
                             visited[child.val].children = child.children
                             
                             # heapq.heapify(q)
-                            q.siftUp(q.idx_of_element[visited[child.val]])
+                            # q.siftUp(q.idx_of_element[visited[child.val]])
                     else:
                         visited[child.val] = child
                         # heapq.heappush(q, child)
@@ -321,28 +329,29 @@ elif algo == "ucs" or algo == "a*":
                     
                     # if path doesnt exist there is no way to 
                     # terminate the code
-            
+        print("Looped ", counter, "times")
         if not foundNode:
+            # f.write('FAIL')
             print('FAIL')
         else:
             # tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
             
-            # print("Queue size = ", len(q.heap))
-            # print("Cost : ",foundNode.g+foundNode.h)
+            print("Queue size = ", len(q.heap))
+            print("Cost : ",foundNode.g+foundNode.h)
 
-            ans_arr = []
-            ans_arr.append(str(target_x)+","+str(target_y))
+            # ans_arr = []
+            # ans_arr.append(str(target_x)+","+str(target_y))
 
             # tempMap[foundNode.val[1]][foundNode.val[0]] = '*'
             pathNode = foundNode.parent
             while pathNode:
                 # print(pathNode)
                 # tempMap[pathNode.val[1]][pathNode.val[0]] = '-'
-                ans_arr.append(str(pathNode.val[0])+","+str(pathNode.val[1]))
+                # ans_arr.append(str(pathNode.val[0])+","+str(pathNode.val[1]))
                 pathNode = pathNode.parent
             
-            ans_arr = ans_arr[::-1]
-            f.write(' '.join(ans_arr))
+            # ans_arr = ans_arr[::-1]
+            # f.write(' '.join(ans_arr))
 
             # for ro in tempMap:
             #     print('  '.join(ro))
@@ -357,4 +366,4 @@ elif algo == "ucs" or algo == "a*":
             f.write("\n")
     f.close()
 
-# print(time.time() - start_time, "seconds")
+print(time.time() - start_time, "seconds")

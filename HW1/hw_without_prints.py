@@ -238,7 +238,8 @@ elif algo == "ucs" or algo == "a*":
             
         if not foundNode:
             # print(q.qsize)
-            print('path doesnt exist')
+            f.write('FAIL')
+            # print('path doesnt exist')
         else:
             # tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
 
