@@ -60,6 +60,7 @@ class MinHeap:
         self.idx_of_element[self.heap[0]], self.idx_of_element[self.heap[-1]] = self.idx_of_element[self.heap[-1]], self.idx_of_element[self.heap[0]]
 
         x = self.heap.pop()
+        del self.idx_of_element[x]
         self.siftDown(0, self.heap)
         return x
 
@@ -166,7 +167,7 @@ def getNeighbours(x, y, w, h):
     
     return neighbours
 
-def get_chidlren_usc_astart(parent, w, h, target_x, target_y):
+def get_chidlren_ucs_astart(parent, w, h, target_x, target_y):
     x, y = parent.val
     # print(parent.val)
     # x = x
@@ -200,7 +201,7 @@ def get_chidlren_usc_astart(parent, w, h, target_x, target_y):
 #             heuristic(6, 4, 0, 0),
 #             []
 #         )
-# print("Children: ",get_chidlren_usc_astart(start_node,w,h,0,0))
+# print("Children: ",get_chidlren_ucs_astart(start_node,w,h,0,0))
 # print("Children: ",getNeighbours(6,4,w,h))
 
 
@@ -242,22 +243,34 @@ if algo == "bfs":
         # print(visited)
         node = (a, b)
         if node not in parent:
-            # fix these shit !!!!!
-            if idx==len(target_sites)-1:
-                outputStr = "FAIL"
-            else:
-                outputStr = "FAIL"
+            f.write("FAIL")
+            # if idx==len(target_sites)-1:
+            #     outputStr = "FAIL"
+            # else:
+            #     outputStr = "FAIL"
         else:
-            outputStr = str(b)+","+str(a)
+            print("q size = ", q.qsize())
+
+            # outputStr = str(b)+","+str(a)
+            # f.write(str(b)+","+str(a))
+            ans_arr = []
+            ans_arr.append(str(a)+","+str(b))
             while node in parent and parent[node]:
                 pn = parent[node]
                 # print(pn)
                 node = pn
-                outputStr += " "+str(pn[1])+","+str(pn[0])
-            outputStr = outputStr[::-1]
-            if idx!=len(target_sites)-1:
-                outputStr += "\n"
-        f.write(outputStr)
+                # outputStr += " "+str(pn[1])+","+str(pn[0])
+                ans_arr.append(str(pn[0])+","+str(pn[1]))
+            # outputStr = outputStr[::-1]
+            # if idx!=len(target_sites)-1:
+            #     outputStr += "\n"
+            # print(ans_arr)
+            ans_arr = ans_arr[::-1]
+            f.write(' '.join(ans_arr))
+        # f.write(outputStr)
+            
+        if idx!=len(target_sites)-1:
+            f.write("\n")
     f.close()
 
 elif algo == "ucs" or algo == "a*":
@@ -287,7 +300,7 @@ elif algo == "ucs" or algo == "a*":
 
         foundNode = None
         counter = 0
-        while q:
+        while not q.isEmpty():
             counter+=1
             # print(q.queue)
             curr_node = q.remove()
@@ -307,7 +320,7 @@ elif algo == "ucs" or algo == "a*":
             # expolored[curr_node.val] = curr_node
 
             
-            get_chidlren_usc_astart(curr_node, w, h, target_x, target_y)
+            get_chidlren_ucs_astart(curr_node, w, h, target_x, target_y)
 
             for child in curr_node.children:
                 if abs(curr_node.elev - child.elev) <= max_elev:
