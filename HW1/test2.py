@@ -150,3 +150,14 @@ for i in q.heap:
 
 while not q.isEmpty():
     print(q.remove().val)
+
+import time
+x = 98987
+q = MinHeap([])
+start_time = time.time()
+for i in range(393430):
+    q.insert(Node(x, "e"))
+    lis = [Node(32, 'rrr') for _ in range(8)]
+    x-=1
+
+print("--- %s seconds ---" % (time.time() - start_time))

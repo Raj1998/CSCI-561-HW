@@ -314,14 +314,14 @@ elif algo == "ucs" or algo == "a*":
                     if child.val in visited:
                         existing_child = visited[child.val]
                         if existing_child.g+existing_child.h > child.g+child.h:
-                            visited[child.val].parent = child.parent
-                            visited[child.val].depth = child.depth
-                            visited[child.val].g = child.g
-                            visited[child.val].h = child.h
-                            visited[child.val].children = child.children
+                            existing_child.parent = child.parent
+                            existing_child.depth = child.depth
+                            existing_child.g = child.g
+                            existing_child.h = child.h
+                            existing_child.children = child.children
                             
                             # heapq.heapify(q)
-                            # q.siftUp(q.idx_of_element[visited[child.val]])
+                            q.siftUp(q.idx_of_element[existing_child])
                     else:
                         visited[child.val] = child
                         # heapq.heappush(q, child)
