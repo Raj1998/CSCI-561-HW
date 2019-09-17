@@ -154,12 +154,15 @@ class MinHeap:
 import time
 import random
 q = MinHeap([])
+frontier = {}
 start_time = time.time()
 x = 98787
-for i in range(393430):
-    q.insert(Node(random.randint(21, 79), "e"))
+for i in range(395898):
+    tmp = Node(random.randint(21, 500), "e")
+    frontier[(i, 1)] = tmp
+    q.insert(tmp)
     # n = Node(x, "ee")
-    # lis = [Node(32, 'rrr') for _ in range(8)]
+    lis = [Node(32, 'rrr') for _ in range(8)]
     x-=1
 
 print("--- %s seconds ---" % (time.time() - start_time))

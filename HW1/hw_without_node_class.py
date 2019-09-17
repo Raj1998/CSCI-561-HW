@@ -178,18 +178,17 @@ def get_chidlren_ucs_astart(parent, w, h, target_x, target_y):
     for i in range(x-1, x+2):
         for j in range(y-1, y+2):
             if not(i == x and j == y) and (0 <= i < w and 0 <= j < h):
-                if (abs(surface[j][i] - parent.elev) <= max_elev):
-                    newNode = Node((i, j), surface[j][i], parent, parent.depth+1, 0, heuristic(i, j, target_x, target_y), [])
-                    if i==x or j==y:
-                        newNode.g = parent.g + 10
-                        if algo == "a*":
-                            newNode.g += abs(newNode.elev - parent.elev)
-                        parent.children.append(newNode)
-                    else:
-                        newNode.g = parent.g + 14
-                        if algo == "a*":
-                            newNode.g += abs(newNode.elev - parent.elev)
-                        parent.children.append(newNode)
+                newNode = Node((i, j), surface[j][i], parent, parent.depth+1, 0, heuristic(i, j, target_x, target_y), [])
+                if i==x or j==y:
+                    newNode.g = parent.g + 10
+                    if algo == "a*":
+                        newNode.g += abs(newNode.elev - parent.elev)
+                    parent.children.append(newNode)
+                else:
+                    newNode.g = parent.g + 14
+                    if algo == "a*":
+                        newNode.g += abs(newNode.elev - parent.elev)
+                    parent.children.append(newNode)
 
     # for i in parent.children:
     #     print(i, i.g)
@@ -291,14 +290,13 @@ elif algo == "ucs" or algo == "a*":
         # q = []
         # hmap = {}
         q = MinHeap([])
-        frontier = {}
-        expolored = set()
 
         # q.put(start_node)
         # heapq.heappush(q, start_node)
         q.insert(start_node)
-        frontier[start_node.val] = start_node
-        
+
+        visited = {}
+        # expolored = {}
 
         # temp_explored = []
 
@@ -312,7 +310,7 @@ elif algo == "ucs" or algo == "a*":
             # temp_explored.append(curr_node.val)
             # print(curr_node.val)
 
-            # if curr_node.val not in frontier:
+            # if curr_node.val not in visited:
             
                 
             if curr_x == target_x and curr_y == target_y:
@@ -320,22 +318,16 @@ elif algo == "ucs" or algo == "a*":
                 foundNode = curr_node
                 break
             
-            # frontier[curr_node.val] = curr_node
-            expolored.add(curr_node.val)
+            visited[curr_node.val] = curr_node
+            # expolored[curr_node.val] = curr_node
 
             
             get_chidlren_ucs_astart(curr_node, w, h, target_x, target_y)
 
             for child in curr_node.children:
-                # if abs(curr_node.elev - child.elev) <= max_elev:
-                if (child.val not in expolored) and (child.val not in frontier):
-                    frontier[child.val] = child
-                    # heapq.heappush(q, child)
-                    q.insert(child)
-                    
-                else:
-                    if child.val in frontier:
-                        existing_child = frontier[child.val]
+                if abs(curr_node.elev - child.elev) <= max_elev:
+                    if child.val in visited:
+                        existing_child = visited[child.val]
                         if existing_child.g+existing_child.h > child.g+child.h:
                             existing_child.parent = child.parent
                             existing_child.depth = child.depth
@@ -345,32 +337,36 @@ elif algo == "ucs" or algo == "a*":
                             
                             # heapq.heapify(q)
                             q.siftUp(q.idx_of_element[existing_child])
-                
-                # if path doesnt exist there is no way to 
-                # terminate the code
+                    else:
+                        visited[child.val] = child
+                        # heapq.heappush(q, child)
+                        q.insert(child)
+                    
+                    # if path doesnt exist there is no way to 
+                    # terminate the code
         print("Looped ", counter, "times")
         if not foundNode:
-            f.write('FAIL')
-            # print('FAIL')
+            # f.write('FAIL')
+            print('FAIL')
         else:
             # tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
             
             print("Queue size = ", len(q.heap))
             print("Cost : ",foundNode.g+foundNode.h)
 
-            ans_arr = []
-            ans_arr.append(str(target_x)+","+str(target_y))
+            # ans_arr = []
+            # ans_arr.append(str(target_x)+","+str(target_y))
 
             # tempMap[foundNode.val[1]][foundNode.val[0]] = '*'
             pathNode = foundNode.parent
             while pathNode:
                 # print(pathNode)
                 # tempMap[pathNode.val[1]][pathNode.val[0]] = '-'
-                ans_arr.append(str(pathNode.val[0])+","+str(pathNode.val[1]))
+                # ans_arr.append(str(pathNode.val[0])+","+str(pathNode.val[1]))
                 pathNode = pathNode.parent
             
-            ans_arr = ans_arr[::-1]
-            f.write(' '.join(ans_arr))
+            # ans_arr = ans_arr[::-1]
+            # f.write(' '.join(ans_arr))
 
             # for ro in tempMap:
             #     print('  '.join(ro))
