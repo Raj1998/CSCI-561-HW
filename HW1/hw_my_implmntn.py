@@ -137,7 +137,7 @@ def heuristic(x, y, target_x, target_y):
         # manhattan_dist = abs(x-target_x) + abs(y-target_y)
         straight_line_dist = int(sqrt(abs(x-target_x)**2 + abs(y-target_y)**2))
         elev_diff = abs(surface[y][x] - surface[target_y][target_x])
-        return straight_line_dist + elev_diff
+        return straight_line_dist  + elev_diff
         # return manhattan_dist + elev_diff
 
 def getNeighbours(x, y, w, h):
@@ -169,7 +169,7 @@ def getNeighbours(x, y, w, h):
     
     return neighbours
 
-def get_chidlren_ucs_astart(parent, w, h, target_x, target_y):
+def get_chidlren_ucs_astart(parent, w, h, target_x, target_y, explored):
     x, y = parent.val
     # print(parent.val)
     # x = x
@@ -178,7 +178,7 @@ def get_chidlren_ucs_astart(parent, w, h, target_x, target_y):
     for i in range(x-1, x+2):
         for j in range(y-1, y+2):
             if not(i == x and j == y) and (0 <= i < w and 0 <= j < h):
-                if (abs(surface[j][i] - parent.elev) <= max_elev):
+                if (abs(surface[j][i] - parent.elev) <= max_elev) and (i,j) not in explored:
                     newNode = Node((i, j), surface[j][i], parent, parent.depth+1, 0, heuristic(i, j, target_x, target_y), [])
                     if i==x or j==y:
                         newNode.g = parent.g + 10
@@ -292,7 +292,7 @@ elif algo == "ucs" or algo == "a*":
         # hmap = {}
         q = MinHeap([])
         frontier = {}
-        expolored = set()
+        explored = set()
 
         # q.put(start_node)
         # heapq.heappush(q, start_node)
@@ -321,14 +321,14 @@ elif algo == "ucs" or algo == "a*":
                 break
             
             # frontier[curr_node.val] = curr_node
-            expolored.add(curr_node.val)
+            explored.add(curr_node.val)
 
             
-            get_chidlren_ucs_astart(curr_node, w, h, target_x, target_y)
+            get_chidlren_ucs_astart(curr_node, w, h, target_x, target_y, explored)
 
             for child in curr_node.children:
                 # if abs(curr_node.elev - child.elev) <= max_elev:
-                if (child.val not in expolored) and (child.val not in frontier):
+                if (child.val not in explored) and (child.val not in frontier):
                     frontier[child.val] = child
                     # heapq.heappush(q, child)
                     q.insert(child)
@@ -344,6 +344,7 @@ elif algo == "ucs" or algo == "a*":
                             existing_child.children = child.children
                             
                             # heapq.heapify(q)
+                        
                             q.siftUp(q.idx_of_element[existing_child])
                 
                 # if path doesnt exist there is no way to 

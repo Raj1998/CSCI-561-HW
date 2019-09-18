@@ -7,6 +7,6 @@ with open('random1.txt', 'w') as f:
     for y in range(h):
         arr = []
         for x in range(w):
-            arr.append('1')
+            arr.append('1') if x == y else arr.append('0')
         arr.append('\n')
         f.writelines(' '.join(arr))
