@@ -130,39 +130,39 @@ class MinHeap:
 
 # print(myHeap.heap)
 
-# r = Node(-1, "r")
-# b = Node(6, "b")
+r = (-1, ("r"))
+b = (6, ("b"))
 
-# q = MinHeap([])
-# q.insert(Node(3, "a"))
-# q.insert(b)
-# q.insert(Node(1, "c"))
-# q.insert(r)
-# q.insert(Node(4, "e"))
+q = MinHeap([])
+q.insert((3, ("a")))
+q.insert(b)
+q.insert((1, ("b")))
+q.insert(r)
+q.insert((4, ("e")))
 
-# b.val = -99
-# # print(q.idx_of_element[b])
+# b[0] = -99
+# print(q.idx_of_element[b])
 
 # q.siftUp(q.idx_of_element[b])
 
-# for i in q.heap:
-#     print(i, i.val)
+for i in q.heap:
+    print(i)
+print('---')
+while not q.isEmpty():
+    print(q.remove())
 
-# while not q.isEmpty():
-#     print(q.remove().val)
+# import time
+# import random
+# q = MinHeap([])
+# frontier = {}
+# start_time = time.time()
+# x = 98787
+# for i in range(395898):
+#     tmp = Node(random.randint(21, 500), "e")
+#     frontier[(i, 1)] = tmp
+#     q.insert(tmp)
+#     # n = Node(x, "ee")
+#     lis = [Node(32, 'rrr') for _ in range(8)]
+#     x-=1
 
-import time
-import random
-q = MinHeap([])
-frontier = {}
-start_time = time.time()
-x = 98787
-for i in range(395898):
-    tmp = Node(random.randint(21, 500), "e")
-    frontier[(i, 1)] = tmp
-    q.insert(tmp)
-    # n = Node(x, "ee")
-    lis = [Node(32, 'rrr') for _ in range(8)]
-    x-=1
-
-print("--- %s seconds ---" % (time.time() - start_time))
+# print("--- %s seconds ---" % (time.time() - start_time))

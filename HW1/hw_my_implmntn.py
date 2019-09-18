@@ -333,19 +333,18 @@ elif algo == "ucs" or algo == "a*":
                     # heapq.heappush(q, child)
                     q.insert(child)
                     
-                else:
-                    if child.val in frontier:
-                        existing_child = frontier[child.val]
-                        if existing_child.g+existing_child.h > child.g+child.h:
-                            existing_child.parent = child.parent
-                            existing_child.depth = child.depth
-                            existing_child.g = child.g
-                            existing_child.h = child.h
-                            existing_child.children = child.children
-                            
-                            # heapq.heapify(q)
+                elif child.val in frontier:
+                    existing_child = frontier[child.val]
+                    if existing_child.g+existing_child.h > child.g+child.h:
+                        existing_child.parent = child.parent
+                        existing_child.depth = child.depth
+                        existing_child.g = child.g
+                        existing_child.h = child.h
+                        existing_child.children = child.children
                         
-                            q.siftUp(q.idx_of_element[existing_child])
+                        # heapq.heapify(q)
+                        
+                        q.siftUp(q.idx_of_element[existing_child])
                 
                 # if path doesnt exist there is no way to 
                 # terminate the code
