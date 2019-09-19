@@ -183,14 +183,14 @@ def get_chidlren_ucs_astart(parent, w, h, target_x, target_y, explored):
                     h_val = heuristic(i, j, target_x, target_y)
                     newNode = [h_val, (i, j), 0, h_val]
                     if i==x or j==y:
-                        newNode[0] += parent[0] + 10
+                        newNode[0] += parent[2] + 10
                         newNode[2] += parent[2] + 10
                         if algo == "a*":
                             newNode[0] += abs(surface[j][i] - surface[y][x])
                             newNode[2] += abs(surface[j][i] - surface[y][x])
                         ans_ret.append(tuple(newNode))
                     else:
-                        newNode[0] += parent[0] + 14
+                        newNode[0] += parent[2] + 14
                         newNode[2] += parent[2] + 14
                         if algo == "a*":
                             newNode[0] += abs(surface[j][i] - surface[y][x])

@@ -98,7 +98,7 @@ class Node():
     def __lt__(self, other):
         return (self.g + self.h) < (other.g + other.h)
 
-with open('input4.txt', 'r') as f:
+with open('input.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
