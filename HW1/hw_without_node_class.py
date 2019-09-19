@@ -135,9 +135,9 @@ def heuristic(x, y, target_x, target_y):
         return 0
     else:
         # manhattan_dist = abs(x-target_x) + abs(y-target_y)
-        straight_line_dist = int(sqrt(abs(x-target_x)**2 + abs(y-target_y)**2))
+        # straight_line_dist = int(sqrt(abs(x-target_x)**2 + abs(y-target_y)**2))
         elev_diff = abs(surface[y][x] - surface[target_y][target_x])
-        return straight_line_dist  + elev_diff
+        return elev_diff
         # return manhattan_dist + elev_diff
 
 def getNeighbours(x, y, w, h):
