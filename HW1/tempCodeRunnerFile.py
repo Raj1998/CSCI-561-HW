@@ -1,2 +1,1 @@
-o == "a*":
-                        #     new
+ans_arr

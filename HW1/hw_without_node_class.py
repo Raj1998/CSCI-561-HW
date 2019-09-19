@@ -4,6 +4,7 @@ import heapq
 import time
 
 start_time = time.time()
+verbose = True
 
 class MinHeap:
     def __init__(self, array):
@@ -315,7 +316,8 @@ elif algo == "ucs" or algo == "a*":
         frontier[start_node[1]] = start_node
         
 
-        temp_explored = []
+        if verbose:
+            temp_explored = []
 
         foundNode = None
         counter = 0
@@ -325,7 +327,9 @@ elif algo == "ucs" or algo == "a*":
             # curr_node = q.remove()
             curr_node = q.get()
             curr_x, curr_y = curr_node[1]
-            temp_explored.append(curr_node[1])
+
+            if verbose:
+                temp_explored.append(curr_node[1])
             # print(curr_node.val)
 
             # if curr_node.val not in frontier:
@@ -380,26 +384,33 @@ elif algo == "ucs" or algo == "a*":
             ans_arr = []
             ans_arr.append(str(target_x)+","+str(target_y))
 
-            tempMap[foundNode[1][1]][foundNode[1][0]] = '*'
+            
+
             pathNode = parent[foundNode[1]]
+            if verbose:
+                tempMap[foundNode[1][1]][foundNode[1][0]] = '*'
+                print(foundNode[1])
+
             while pathNode:
-                print(pathNode)
-                tempMap[pathNode[1]][pathNode[0]] = '-'
+                if verbose:
+                    print(pathNode)
+                    tempMap[pathNode[1]][pathNode[0]] = '-'
                 ans_arr.append(str(pathNode[0])+","+str(pathNode[1]))
                 pathNode = parent[pathNode]
             
             ans_arr = ans_arr[::-1]
             f.write(' '.join(ans_arr))
 
-            for ro in tempMap:
-                print('  '.join(ro))
-            
-            tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
-            for i in temp_explored:
-                tempMap[i[1]][i[0]] = '-'
-            print('--------')
-            for ro in tempMap:
-                print('  '.join(ro))
+            if verbose:
+                for ro in tempMap:
+                    print('  '.join(ro))
+                
+                tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
+                for i in temp_explored:
+                    tempMap[i[1]][i[0]] = '-'
+                print('--------')
+                for ro in tempMap:
+                    print('  '.join(ro))
         if idx!=len(target_sites)-1:
             f.write("\n")
     f.close()
