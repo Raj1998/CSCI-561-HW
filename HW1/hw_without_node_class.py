@@ -181,20 +181,18 @@ def get_chidlren_ucs_astart(parent, w, h, target_x, target_y, explored):
                 if (abs(surface[j][i] - surface[y][x]) <= max_elev) and (i,j) not in explored:
                     # newNode = Node((i, j), surface[j][i], parent, parent.depth+1, 0, heuristic(i, j, target_x, target_y), [])
                     h_val = heuristic(i, j, target_x, target_y)
-                    newNode = [h_val, (i, j), 0, h_val]
+                    newNode = [0, (i, j), 0, h_val]
                     if i==x or j==y:
-                        newNode[0] += parent[2] + 10
                         newNode[2] += parent[2] + 10
                         if algo == "a*":
-                            newNode[0] += abs(surface[j][i] - surface[y][x])
                             newNode[2] += abs(surface[j][i] - surface[y][x])
+                        newNode[0] = newNode[2] + newNode[3]
                         ans_ret.append(tuple(newNode))
                     else:
-                        newNode[0] += parent[2] + 14
                         newNode[2] += parent[2] + 14
                         if algo == "a*":
-                            newNode[0] += abs(surface[j][i] - surface[y][x])
                             newNode[2] += abs(surface[j][i] - surface[y][x])
+                        newNode[0] = newNode[2] + newNode[3]
                         ans_ret.append(tuple(newNode))
     return ans_ret
 
