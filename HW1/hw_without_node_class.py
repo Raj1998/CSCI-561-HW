@@ -98,7 +98,7 @@ class Node():
     def __lt__(self, other):
         return (self.g + self.h) < (other.g + other.h)
 
-with open('input4.txt', 'r') as f:
+with open('input3.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -132,12 +132,15 @@ for i in range(len(arr)-h, len(arr)):
 
 def heuristic(x, y, target_x, target_y):
     if algo == "ucs":
+    # if algo == "ucs" or algo == "a*":
         return 0
     else:
         # manhattan_dist = abs(x-target_x) + abs(y-target_y)
-        # straight_line_dist = int(sqrt(abs(x-target_x)**2 + abs(y-target_y)**2))
+        straight_line_dist = int(sqrt(abs(x-target_x)**2 + abs(y-target_y)**2)*10)
         elev_diff = abs(surface[y][x] - surface[target_y][target_x])
-        return elev_diff
+        return int(sqrt(elev_diff**2 + straight_line_dist**2))
+        # return (elev_diff + straight_line_dist)
+
         # return manhattan_dist + elev_diff
 
 def getNeighbours(x, y, w, h):
@@ -194,6 +197,9 @@ def get_chidlren_ucs_astart(parent, w, h, target_x, target_y, explored):
                             newNode[2] += abs(surface[j][i] - surface[y][x])
                         newNode[0] = newNode[2] + newNode[3]
                         ans_ret.append(tuple(newNode))
+    # for rr in ans_ret:
+    #     print(rr)
+    # print('---')
     return ans_ret
 
     # for i in parent.children:
@@ -209,7 +215,9 @@ def get_chidlren_ucs_astart(parent, w, h, target_x, target_y, explored):
 #             heuristic(6, 4, 0, 0),
 #             []
 #         )
-# print("Children: ",get_chidlren_ucs_astart(start_node,w,h,0,0))
+# start_node = (0+heuristic(1,2, 4, 3), (1,2), 0, heuristic(1,2, 4, 3))
+# print(start_node)
+# get_chidlren_ucs_astart(start_node,w,h,0,0, {})
 # print("Children: ",getNeighbours(6,4,w,h))
 
 
@@ -307,7 +315,7 @@ elif algo == "ucs" or algo == "a*":
         frontier[start_node[1]] = start_node
         
 
-        # temp_explored = []
+        temp_explored = []
 
         foundNode = None
         counter = 0
@@ -317,7 +325,7 @@ elif algo == "ucs" or algo == "a*":
             # curr_node = q.remove()
             curr_node = q.get()
             curr_x, curr_y = curr_node[1]
-            # temp_explored.append(curr_node.val)
+            temp_explored.append(curr_node[1])
             # print(curr_node.val)
 
             # if curr_node.val not in frontier:
@@ -364,7 +372,7 @@ elif algo == "ucs" or algo == "a*":
             f.write('FAIL')
             # print('FAIL')
         else:
-            # tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
+            tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
             
             print("Queue size = ", q.qsize())
             print("Cost : ",foundNode[2])
@@ -372,26 +380,26 @@ elif algo == "ucs" or algo == "a*":
             ans_arr = []
             ans_arr.append(str(target_x)+","+str(target_y))
 
-            # tempMap[foundNode.val[1]][foundNode.val[0]] = '*'
+            tempMap[foundNode[1][1]][foundNode[1][0]] = '*'
             pathNode = parent[foundNode[1]]
             while pathNode:
-                # print(pathNode)
-                # tempMap[pathNode.val[1]][pathNode.val[0]] = '-'
+                print(pathNode)
+                tempMap[pathNode[1]][pathNode[0]] = '-'
                 ans_arr.append(str(pathNode[0])+","+str(pathNode[1]))
                 pathNode = parent[pathNode]
             
             ans_arr = ans_arr[::-1]
             f.write(' '.join(ans_arr))
 
-            # for ro in tempMap:
-            #     print('  '.join(ro))
+            for ro in tempMap:
+                print('  '.join(ro))
             
-            # tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
-            # for i in temp_explored:
-            #     tempMap[i[1]][i[0]] = '-'
-            # print('--------')
-            # for ro in tempMap:
-            #     print('  '.join(ro))
+            tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
+            for i in temp_explored:
+                tempMap[i[1]][i[0]] = '-'
+            print('--------')
+            for ro in tempMap:
+                print('  '.join(ro))
         if idx!=len(target_sites)-1:
             f.write("\n")
     f.close()
