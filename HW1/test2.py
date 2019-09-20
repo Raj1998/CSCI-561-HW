@@ -83,7 +83,7 @@ class MinHeap:
             
             if smallest != idx:
                 array[idx], array[smallest] = array[smallest], array[idx]
-                self.idx_of_element[self.heap[idx]], self.idx_of_element[self.heap[smallest]] = self.idx_of_element[self.heap[smallest]], self.idx_of_element[self.heap[idx]]
+                self.idx_of_element[self.heap[idx][1]], self.idx_of_element[self.heap[smallest][1]] = self.idx_of_element[self.heap[smallest][1]], self.idx_of_element[self.heap[idx][1]]
                 idx = smallest
             else:
                 break
@@ -93,7 +93,7 @@ class MinHeap:
         p = self.getParentIdx(idx)
         while p >= 0 and self.heap[p] > self.heap[idx]:
             self.heap[p], self.heap[idx] = self.heap[idx], self.heap[p]
-            self.idx_of_element[self.heap[p]], self.idx_of_element[self.heap[idx]] = self.idx_of_element[self.heap[idx]], self.idx_of_element[self.heap[p]]
+            self.idx_of_element[self.heap[p][1]], self.idx_of_element[self.heap[idx][1]] = self.idx_of_element[self.heap[idx][1]], self.idx_of_element[self.heap[p][1]]
             idx = p
             p = self.getParentIdx(idx)
 
@@ -104,7 +104,7 @@ class MinHeap:
     def remove(self):
         # Write your code here.
         self.heap[0], self.heap[-1] = self.heap[-1], self.heap[0]
-        self.idx_of_element[self.heap[0]], self.idx_of_element[self.heap[-1]] = self.idx_of_element[self.heap[-1]], self.idx_of_element[self.heap[0]]
+        self.idx_of_element[self.heap[0][1]], self.idx_of_element[self.heap[-1][1]] = self.idx_of_element[self.heap[-1][1]], self.idx_of_element[self.heap[0][1]]
 
         x = self.heap.pop()
         self.siftDown(0, self.heap)
@@ -113,7 +113,7 @@ class MinHeap:
     def insert(self, value):
         # Write your code here.
         self.heap.append(value)
-        self.idx_of_element[value] = len(self.heap) - 1
+        self.idx_of_element[value[1]] = len(self.heap) - 1
         self.siftUp(len(self.heap)-1)
     
     def isEmpty(self):
@@ -130,20 +130,20 @@ class MinHeap:
 
 # print(myHeap.heap)
 
-r = (-1, ("r"))
-b = (6, ("b"))
+r = ([-1], ("r"))
+b = ([6], ("b"))
 
 q = MinHeap([])
-q.insert((3, ("a")))
+q.insert(([3], ("a")))
 q.insert(b)
-q.insert((1, ("b")))
+q.insert(([1], ("x")))
 q.insert(r)
-q.insert((4, ("e")))
+q.insert(([4], ("e")))
 
-# b[0] = -99
+b[0][0] = -99
 # print(q.idx_of_element[b])
 
-# q.siftUp(q.idx_of_element[b])
+q.siftUp(q.idx_of_element[b[1]])
 
 for i in q.heap:
     print(i)

@@ -44,7 +44,7 @@ class MinHeap:
             
             if smallest != idx:
                 array[idx], array[smallest] = array[smallest], array[idx]
-                self.idx_of_element[self.heap[idx]], self.idx_of_element[self.heap[smallest]] = self.idx_of_element[self.heap[smallest]], self.idx_of_element[self.heap[idx]]
+                self.idx_of_element[self.heap[idx][1]], self.idx_of_element[self.heap[smallest][1]] = self.idx_of_element[self.heap[smallest][1]], self.idx_of_element[self.heap[idx][1]]
                 idx = smallest
             else:
                 break
@@ -54,7 +54,7 @@ class MinHeap:
         p = self.getParentIdx(idx)
         while p >= 0 and self.heap[p] > self.heap[idx]:
             self.heap[p], self.heap[idx] = self.heap[idx], self.heap[p]
-            self.idx_of_element[self.heap[p]], self.idx_of_element[self.heap[idx]] = self.idx_of_element[self.heap[idx]], self.idx_of_element[self.heap[p]]
+            self.idx_of_element[self.heap[p][1]], self.idx_of_element[self.heap[idx][1]] = self.idx_of_element[self.heap[idx][1]], self.idx_of_element[self.heap[p][1]]
             idx = p
             p = self.getParentIdx(idx)
 
@@ -65,20 +65,19 @@ class MinHeap:
     def remove(self):
         # Write your code here.
         self.heap[0], self.heap[-1] = self.heap[-1], self.heap[0]
-        self.idx_of_element[self.heap[0]], self.idx_of_element[self.heap[-1]] = self.idx_of_element[self.heap[-1]], self.idx_of_element[self.heap[0]]
+        self.idx_of_element[self.heap[0][1]], self.idx_of_element[self.heap[-1][1]] = self.idx_of_element[self.heap[-1][1]], self.idx_of_element[self.heap[0][1]]
 
         x = self.heap.pop()
-        del self.idx_of_element[x]
         self.siftDown(0, self.heap)
         return x
 
     def insert(self, value):
         # Write your code here.
         self.heap.append(value)
-        self.idx_of_element[value] = len(self.heap) - 1
+        self.idx_of_element[value[1]] = len(self.heap) - 1
         self.siftUp(len(self.heap)-1)
     
-    def isEmpty(self):
+    def empty(self):
         return True if len(self.heap) == 0 else False
 
 
@@ -185,18 +184,18 @@ def get_chidlren_ucs_astart(parent, w, h, target_x, target_y, explored):
                 if (abs(surface[j][i] - surface[y][x]) <= max_elev) and (i,j) not in explored:
                     # newNode = Node((i, j), surface[j][i], parent, parent.depth+1, 0, heuristic(i, j, target_x, target_y), [])
                     h_val = heuristic(i, j, target_x, target_y)
-                    newNode = [0, (i, j), 0, h_val]
+                    newNode = [[0], (i, j), [0], [h_val]]
                     if i==x or j==y:
-                        newNode[2] += parent[2] + 10
+                        newNode[2][0] += parent[2][0] + 10
                         if algo == "a*":
-                            newNode[2] += abs(surface[j][i] - surface[y][x])
-                        newNode[0] = newNode[2] + newNode[3]
+                            newNode[2][0] += abs(surface[j][i] - surface[y][x])
+                        newNode[0][0] = newNode[2][0] + newNode[3][0]
                         ans_ret.append(tuple(newNode))
                     else:
-                        newNode[2] += parent[2] + 14
+                        newNode[2][0] += parent[2][0] + 14
                         if algo == "a*":
-                            newNode[2] += abs(surface[j][i] - surface[y][x])
-                        newNode[0] = newNode[2] + newNode[3]
+                            newNode[2][0] += abs(surface[j][i] - surface[y][x])
+                        newNode[0][0] = newNode[2][0] + newNode[3][0]
                         ans_ret.append(tuple(newNode))
     # for rr in ans_ret:
     #     print(rr)
@@ -300,19 +299,19 @@ elif algo == "ucs" or algo == "a*":
         #     heuristic(x,y, target_x, target_y),
         #     []
         # )
-        start_node = (0+heuristic(x,y, target_x, target_y), (x,y), 0, heuristic(x,y, target_x, target_y))
+        start_node = ([0+heuristic(x,y, target_x, target_y)], (x,y), [0], [heuristic(x,y, target_x, target_y)])
         parent = { start_node[1]: None }
  
-        q = queue.PriorityQueue()
+        # q = queue.PriorityQueue()
         # q = []
         # hmap = {}
-        # q = MinHeap([])
+        q = MinHeap([])
         frontier = {}
         explored = set()
 
-        q.put(start_node)
+        # q.put(start_node)
         # heapq.heappush(q, start_node)
-        # q.insert(start_node)
+        q.insert(start_node)
         frontier[start_node[1]] = start_node
         
 
@@ -324,8 +323,8 @@ elif algo == "ucs" or algo == "a*":
         while not q.empty():
             counter+=1
             # print(q.queue)
-            # curr_node = q.remove()
-            curr_node = q.get()
+            curr_node = q.remove()
+            # curr_node = q.get()
             curr_x, curr_y = curr_node[1]
 
             if verbose:
@@ -351,23 +350,24 @@ elif algo == "ucs" or algo == "a*":
                 if (child[1] not in explored) and (child[1] not in frontier):
                     frontier[child[1]] = child
                     # heapq.heappush(q, child)
-                    q.put(child)
+                    # q.put(child)
+                    q.insert(child)
                     parent[child[1]] = curr_node[1]
                     
                 elif child[1] in frontier:
                     existing_child = frontier[child[1]]
-                    if existing_child[0] > child[0]:
-                        # existing_child.parent = child.parent
-                        # existing_child.depth = child.depth
-                        # existing_child.g = child.g
-                        # existing_child.h = child.h
-                        # existing_child.children = child.children
-                        frontier[child[1]] = child
-                        q.put(child)
-                        parent[child[1]] = curr_node[1]
+                    if existing_child[0][0] > child[0][0]:
+                        parent[existing_child[1]] = curr_node[1]
+                        existing_child[3][0] = child[3][0]                        
+                        existing_child[0][0] = child[0][0]
+                        existing_child[2][0] = child[2][0]
+                        
+                        # frontier[child[1]] = child
+                        
+                        # parent[child[1]] = curr_node[1]
                         # heapq.heapify(q)
                         
-                        # q.siftUp(q.idx_of_element[existing_child])
+                        q.siftUp(q.idx_of_element[existing_child[1]])
                 
                 # if path doesnt exist there is no way to 
                 # terminate the code
@@ -378,7 +378,8 @@ elif algo == "ucs" or algo == "a*":
         else:
             tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
             
-            print("Queue size = ", q.qsize())
+            # print("Queue size = ", q.qsize())
+            print("Queue size = ", len(q.heap))
             print("Cost : ",foundNode[2])
 
             ans_arr = []
