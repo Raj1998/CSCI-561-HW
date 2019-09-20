@@ -1,105 +1,8 @@
 import queue
 from math import sqrt
 import heapq
-import time
 
-start_time = time.time()
-verbose = False
-
-class MinHeap:
-    def __init__(self, array):
-        # Do not edit the line below.
-        self.heap = self.buildHeap(array)
-        self.idx_of_element = {}
-    
-    def getParentIdx(self, idx):
-        return (idx - 1) // 2
-    
-    def getLeftChildIdx(self, idx):
-        return idx * 2 + 1
-    
-    def getRightChildIdx(self, idx):
-        return idx * 2 + 2
-
-    def buildHeap(self, array):
-        # Write your code here.
-        lastIdx = len(array) - 1
-        startFrom = self.getParentIdx(lastIdx)
-        for i in range(startFrom, -1, -1):
-            self.siftDown(i, array)
-        return array
-
-    # this is min-heapify method
-    def siftDown(self, idx, array):
-        # Write your code here.
-        while True:
-            l = self.getLeftChildIdx(idx)
-            r = self.getRightChildIdx(idx)
-
-            smallest = idx
-            if l < len(array) and array[l] < array[idx]:
-                smallest = l
-            if r < len(array) and array[r] < array[smallest]:
-                smallest = r
-            
-            if smallest != idx:
-                array[idx], array[smallest] = array[smallest], array[idx]
-                self.idx_of_element[self.heap[idx]], self.idx_of_element[self.heap[smallest]] = self.idx_of_element[self.heap[smallest]], self.idx_of_element[self.heap[idx]]
-                idx = smallest
-            else:
-                break
-
-    def siftUp(self, idx):
-        # Write your code here.
-        p = self.getParentIdx(idx)
-        while p >= 0 and self.heap[p] > self.heap[idx]:
-            self.heap[p], self.heap[idx] = self.heap[idx], self.heap[p]
-            self.idx_of_element[self.heap[p]], self.idx_of_element[self.heap[idx]] = self.idx_of_element[self.heap[idx]], self.idx_of_element[self.heap[p]]
-            idx = p
-            p = self.getParentIdx(idx)
-
-    def peek(self):
-        # Write your code here.
-        return self.heap[0]
-
-    def remove(self):
-        # Write your code here.
-        self.heap[0], self.heap[-1] = self.heap[-1], self.heap[0]
-        self.idx_of_element[self.heap[0]], self.idx_of_element[self.heap[-1]] = self.idx_of_element[self.heap[-1]], self.idx_of_element[self.heap[0]]
-
-        x = self.heap.pop()
-        del self.idx_of_element[x]
-        self.siftDown(0, self.heap)
-        return x
-
-    def insert(self, value):
-        # Write your code here.
-        self.heap.append(value)
-        self.idx_of_element[value] = len(self.heap) - 1
-        self.siftUp(len(self.heap)-1)
-    
-    def isEmpty(self):
-        return True if len(self.heap) == 0 else False
-
-
-
-class Node():
-    def __init__(self, val, elev, parent, depth, g, h,children):
-        self.val = val
-        self.elev = elev
-        self.parent = parent
-        self.depth = depth
-        self.g = g
-        self.h = h
-        self.children = children
-
-    def __str__(self):
-        return str(self.val)
-
-    def __lt__(self, other):
-        return (self.g + self.h) < (other.g + other.h)
-
-with open('input4.txt', 'r') as f:
+with open('input.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -119,17 +22,6 @@ for i in range(n):
 surface = []
 for i in range(len(arr)-h, len(arr)):
     surface.append(list(map(int, arr[i].split())))
-
-# print()
-# print(arr)
-
-# print(algo)
-# print(w, h)
-# print(x, y)
-# print(max_elev)
-# print(target_sites)
-# for i in surface:
-#     print(i)
 
 def heuristic(x, y, target_x, target_y):
     if algo == "ucs":
@@ -170,7 +62,6 @@ def getNeighbours(x, y, w, h):
     #             if 0 <= i < w and 0 <= j < h:
     #                 neighbours.append([i, j])
     
-    
     return neighbours
 
 def get_chidlren_ucs_astart(parent, w, h, target_x, target_y, explored):
@@ -203,25 +94,6 @@ def get_chidlren_ucs_astart(parent, w, h, target_x, target_y, explored):
     # print('---')
     return ans_ret
 
-    # for i in parent.children:
-    #     print(i, i.g)
-
-# print(surface[4][6])
-# start_node = Node(
-#             [6, 4],
-#             surface[4][6],
-#             None,
-#             0,
-#             0,
-#             heuristic(6, 4, 0, 0),
-#             []
-#         )
-# start_node = (0+heuristic(1,2, 4, 3), (1,2), 0, heuristic(1,2, 4, 3))
-# print(start_node)
-# get_chidlren_ucs_astart(start_node,w,h,0,0, {})
-# print("Children: ",getNeighbours(6,4,w,h))
-
-
 
 if algo == "bfs":
     f = open('output.txt', 'w')
@@ -236,9 +108,9 @@ if algo == "bfs":
         visited.add((x, y))
         parent[(x,y)] = None
 
-        counter = 0
+        # counter = 0
         while True:
-            counter += 1
+            # counter += 1
             if q.empty():
                 # print("path doesnt exist")
                 break
@@ -255,7 +127,7 @@ if algo == "bfs":
                     q.put([this_x, this_y])
                     parent[(this_x, this_y)] = (curr_x, curr_y)
                     visited.add((this_x, this_y))
-        print("Looped ", counter, "times")  
+        # print("Looped ", counter, "times")  
 
         # print(visited)
         node = (a, b)
@@ -266,7 +138,7 @@ if algo == "bfs":
             # else:
             #     outputStr = "FAIL"
         else:
-            print("q size = ", q.qsize())
+            # print("q size = ", q.qsize())
 
             # outputStr = str(b)+","+str(a)
             # f.write(str(b)+","+str(a))
@@ -316,20 +188,14 @@ elif algo == "ucs" or algo == "a*":
         frontier[start_node[1]] = start_node
         
 
-        if verbose:
-            temp_explored = []
-
         foundNode = None
-        counter = 0
+        # counter = 0
         while not q.empty():
-            counter+=1
+            # counter+=1
             # print(q.queue)
             # curr_node = q.remove()
             curr_node = q.get()
             curr_x, curr_y = curr_node[1]
-
-            if verbose:
-                temp_explored.append(curr_node[1])
             # print(curr_node.val)
 
             # if curr_node.val not in frontier:
@@ -371,15 +237,15 @@ elif algo == "ucs" or algo == "a*":
                 
                 # if path doesnt exist there is no way to 
                 # terminate the code
-        print("Looped ", counter, "times")
+        # print("Looped ", counter, "times")
         if not foundNode:
             f.write('FAIL')
             # print('FAIL')
         else:
-            tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
+            # tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
             
-            print("Queue size = ", q.qsize())
-            print("Cost : ",foundNode[2])
+            # print("Queue size = ", q.qsize())
+            # print("Cost : ",foundNode[2])
 
             ans_arr = []
             ans_arr.append(str(target_x)+","+str(target_y))
@@ -387,32 +253,15 @@ elif algo == "ucs" or algo == "a*":
             
 
             pathNode = parent[foundNode[1]]
-            if verbose:
-                tempMap[foundNode[1][1]][foundNode[1][0]] = '*'
-                print(foundNode[1])
+          
 
             while pathNode:
-                if verbose:
-                    print(pathNode)
-                    tempMap[pathNode[1]][pathNode[0]] = '-'
                 ans_arr.append(str(pathNode[0])+","+str(pathNode[1]))
                 pathNode = parent[pathNode]
             
             ans_arr = ans_arr[::-1]
             f.write(' '.join(ans_arr))
 
-            if verbose:
-                for ro in tempMap:
-                    print('  '.join(ro))
-                
-                tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
-                for i in temp_explored:
-                    tempMap[i[1]][i[0]] = '-'
-                print('--------')
-                for ro in tempMap:
-                    print('  '.join(ro))
         if idx!=len(target_sites)-1:
             f.write("\n")
     f.close()
-
-print(time.time() - start_time, "seconds")
