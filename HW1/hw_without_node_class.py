@@ -1,6 +1,6 @@
 import queue
 from math import sqrt
-import heapq
+# import heapq
 import time
 
 start_time = time.time()
@@ -131,18 +131,32 @@ for i in range(len(arr)-h, len(arr)):
 # for i in surface:
 #     print(i)
 
+# print(surface[330][121])
+# print(surface[331][121])
+# print(surface[332][121])
+# print(surface[333][121])
+
+
 def heuristic(x, y, target_x, target_y):
     if algo == "ucs":
     # if algo == "ucs" or algo == "a*":
         return 0
     else:
-        # manhattan_dist = abs(x-target_x) + abs(y-target_y)
+        D = 10
+        D2 = 14
+        dx = abs(x-target_x)
+        dy = abs(y-target_y)
+        manhattan_dist = abs(x-target_x) + abs(y-target_y)
         straight_line_dist = int(sqrt(abs(x-target_x)**2 + abs(y-target_y)**2)*10)
         elev_diff = abs(surface[y][x] - surface[target_y][target_x])
-        return int(sqrt(elev_diff**2 + straight_line_dist**2))
+        
+        diagonal_dist = D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
+        
+        # return int(sqrt(elev_diff**2 + straight_line_dist**2))
         # return (elev_diff + straight_line_dist)
-
-        # return manhattan_dist + elev_diff
+        # return straight_line_dist
+        # return manhattan_dist
+        return diagonal_dist
 
 def getNeighbours(x, y, w, h):
     neighbours = []
@@ -175,7 +189,7 @@ def getNeighbours(x, y, w, h):
 
 def get_chidlren_ucs_astart(parent, w, h, target_x, target_y, explored):
     x, y = parent[1]
-    # print(parent.val)
+    # print(parent)
     # x = x
     # y = y
     ans_ret = []
@@ -290,6 +304,7 @@ if algo == "bfs":
             f.write("\n")
     f.close()
 
+# def corr_tester(algo, sites):
 elif algo == "ucs" or algo == "a*":
     f = open('output.txt', 'w')
     for idx, sites in enumerate(target_sites):

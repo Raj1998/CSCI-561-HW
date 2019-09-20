@@ -1,6 +1,10 @@
 import queue
 from math import sqrt
-import heapq
+# import heapq
+import time
+
+start_time = time.time()
+verbose = False
 
 with open('input.txt', 'r') as f:
     line = f.readline()
@@ -23,18 +27,6 @@ surface = []
 for i in range(len(arr)-h, len(arr)):
     surface.append(list(map(int, arr[i].split())))
 
-def heuristic(x, y, target_x, target_y):
-    if algo == "ucs":
-    # if algo == "ucs" or algo == "a*":
-        return 0
-    else:
-        # manhattan_dist = abs(x-target_x) + abs(y-target_y)
-        straight_line_dist = int(sqrt(abs(x-target_x)**2 + abs(y-target_y)**2)*10)
-        elev_diff = abs(surface[y][x] - surface[target_y][target_x])
-        return int(sqrt(elev_diff**2 + straight_line_dist**2))
-        # return (elev_diff + straight_line_dist)
-
-        # return manhattan_dist + elev_diff
 
 def getNeighbours(x, y, w, h):
     neighbours = []
@@ -62,11 +54,34 @@ def getNeighbours(x, y, w, h):
     #             if 0 <= i < w and 0 <= j < h:
     #                 neighbours.append([i, j])
     
+    
     return neighbours
+
+
+def heuristic(x, y, target_x, target_y):
+    if algo == "ucs":
+    # if algo == "ucs" or algo == "a*":
+        return 0
+    else:
+        D = 10
+        D2 = 14
+        dx = abs(x-target_x)
+        dy = abs(y-target_y)
+        # manhattan_dist = abs(x-target_x) + abs(y-target_y)
+        # straight_line_dist = int(sqrt(abs(x-target_x)**2 + abs(y-target_y)**2)*10)
+        # elev_diff = abs(surface[y][x] - surface[target_y][target_x])
+        
+        diagonal_dist = D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
+        
+        # return int(sqrt(elev_diff**2 + straight_line_dist**2))
+        # return (elev_diff + straight_line_dist)
+        # return straight_line_dist
+        # return manhattan_dist
+        return diagonal_dist
 
 def get_chidlren_ucs_astart(parent, w, h, target_x, target_y, explored):
     x, y = parent[1]
-    # print(parent.val)
+    # print(parent)
     # x = x
     # y = y
     ans_ret = []
@@ -93,6 +108,25 @@ def get_chidlren_ucs_astart(parent, w, h, target_x, target_y, explored):
     #     print(rr)
     # print('---')
     return ans_ret
+
+    # for i in parent.children:
+    #     print(i, i.g)
+
+# print(surface[4][6])
+# start_node = Node(
+#             [6, 4],
+#             surface[4][6],
+#             None,
+#             0,
+#             0,
+#             heuristic(6, 4, 0, 0),
+#             []
+#         )
+# start_node = (0+heuristic(1,2, 4, 3), (1,2), 0, heuristic(1,2, 4, 3))
+# print(start_node)
+# get_chidlren_ucs_astart(start_node,w,h,0,0, {})
+# print("Children: ",getNeighbours(6,4,w,h))
+
 
 
 if algo == "bfs":
@@ -138,7 +172,7 @@ if algo == "bfs":
             # else:
             #     outputStr = "FAIL"
         else:
-            # print("q size = ", q.qsize())
+            print("q size = ", q.qsize())
 
             # outputStr = str(b)+","+str(a)
             # f.write(str(b)+","+str(a))
@@ -176,26 +210,23 @@ elif algo == "ucs" or algo == "a*":
         parent = { start_node[1]: None }
  
         q = queue.PriorityQueue()
-        # q = []
-        # hmap = {}
-        # q = MinHeap([])
         frontier = {}
         explored = set()
 
         q.put(start_node)
-        # heapq.heappush(q, start_node)
-        # q.insert(start_node)
-        frontier[start_node[1]] = start_node
         
+        frontier[start_node[1]] = start_node
+    
 
         foundNode = None
-        # counter = 0
         while not q.empty():
-            # counter+=1
+            
             # print(q.queue)
             # curr_node = q.remove()
             curr_node = q.get()
             curr_x, curr_y = curr_node[1]
+
+            
             # print(curr_node.val)
 
             # if curr_node.val not in frontier:
@@ -237,7 +268,7 @@ elif algo == "ucs" or algo == "a*":
                 
                 # if path doesnt exist there is no way to 
                 # terminate the code
-        # print("Looped ", counter, "times")
+       
         if not foundNode:
             f.write('FAIL')
             # print('FAIL')
@@ -253,8 +284,7 @@ elif algo == "ucs" or algo == "a*":
             
 
             pathNode = parent[foundNode[1]]
-          
-
+            
             while pathNode:
                 ans_arr.append(str(pathNode[0])+","+str(pathNode[1]))
                 pathNode = parent[pathNode]
@@ -262,6 +292,7 @@ elif algo == "ucs" or algo == "a*":
             ans_arr = ans_arr[::-1]
             f.write(' '.join(ans_arr))
 
+           
         if idx!=len(target_sites)-1:
             f.write("\n")
     f.close()
