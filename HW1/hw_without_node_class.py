@@ -146,9 +146,9 @@ def heuristic(x, y, target_x, target_y):
         D2 = 14
         dx = abs(x-target_x)
         dy = abs(y-target_y)
-        manhattan_dist = abs(x-target_x) + abs(y-target_y)
-        straight_line_dist = int(sqrt(abs(x-target_x)**2 + abs(y-target_y)**2)*10)
-        elev_diff = abs(surface[y][x] - surface[target_y][target_x])
+        # manhattan_dist = abs(x-target_x) + abs(y-target_y)
+        # straight_line_dist = int(sqrt(abs(x-target_x)**2 + abs(y-target_y)**2)*10)
+        # elev_diff = abs(surface[y][x] - surface[target_y][target_x])
         
         diagonal_dist = D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
         
