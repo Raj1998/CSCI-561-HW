@@ -142,15 +142,13 @@ def heuristic(x, y, target_x, target_y):
     # if algo == "ucs" or algo == "a*":
         return 0
     else:
-        D = 10
-        D2 = 14
         dx = abs(x-target_x)
         dy = abs(y-target_y)
         # manhattan_dist = abs(x-target_x) + abs(y-target_y)
         # straight_line_dist = int(sqrt(abs(x-target_x)**2 + abs(y-target_y)**2)*10)
         # elev_diff = abs(surface[y][x] - surface[target_y][target_x])
         
-        diagonal_dist = D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
+        diagonal_dist = 10 * (dx + dy) + (14 - 2 * 10) * min(dx, dy)
         
         # return int(sqrt(elev_diff**2 + straight_line_dist**2))
         # return (elev_diff + straight_line_dist)
