@@ -6,99 +6,6 @@ import time
 start_time = time.time()
 verbose = False
 
-class MinHeap:
-    def __init__(self, array):
-        # Do not edit the line below.
-        self.heap = self.buildHeap(array)
-        self.idx_of_element = {}
-    
-    def getParentIdx(self, idx):
-        return (idx - 1) // 2
-    
-    def getLeftChildIdx(self, idx):
-        return idx * 2 + 1
-    
-    def getRightChildIdx(self, idx):
-        return idx * 2 + 2
-
-    def buildHeap(self, array):
-        # Write your code here.
-        lastIdx = len(array) - 1
-        startFrom = self.getParentIdx(lastIdx)
-        for i in range(startFrom, -1, -1):
-            self.siftDown(i, array)
-        return array
-
-    # this is min-heapify method
-    def siftDown(self, idx, array):
-        # Write your code here.
-        while True:
-            l = self.getLeftChildIdx(idx)
-            r = self.getRightChildIdx(idx)
-
-            smallest = idx
-            if l < len(array) and array[l] < array[idx]:
-                smallest = l
-            if r < len(array) and array[r] < array[smallest]:
-                smallest = r
-            
-            if smallest != idx:
-                array[idx], array[smallest] = array[smallest], array[idx]
-                self.idx_of_element[self.heap[idx]], self.idx_of_element[self.heap[smallest]] = self.idx_of_element[self.heap[smallest]], self.idx_of_element[self.heap[idx]]
-                idx = smallest
-            else:
-                break
-
-    def siftUp(self, idx):
-        # Write your code here.
-        p = self.getParentIdx(idx)
-        while p >= 0 and self.heap[p] > self.heap[idx]:
-            self.heap[p], self.heap[idx] = self.heap[idx], self.heap[p]
-            self.idx_of_element[self.heap[p]], self.idx_of_element[self.heap[idx]] = self.idx_of_element[self.heap[idx]], self.idx_of_element[self.heap[p]]
-            idx = p
-            p = self.getParentIdx(idx)
-
-    def peek(self):
-        # Write your code here.
-        return self.heap[0]
-
-    def remove(self):
-        # Write your code here.
-        self.heap[0], self.heap[-1] = self.heap[-1], self.heap[0]
-        self.idx_of_element[self.heap[0]], self.idx_of_element[self.heap[-1]] = self.idx_of_element[self.heap[-1]], self.idx_of_element[self.heap[0]]
-
-        x = self.heap.pop()
-        del self.idx_of_element[x]
-        self.siftDown(0, self.heap)
-        return x
-
-    def insert(self, value):
-        # Write your code here.
-        self.heap.append(value)
-        self.idx_of_element[value] = len(self.heap) - 1
-        self.siftUp(len(self.heap)-1)
-    
-    def isEmpty(self):
-        return True if len(self.heap) == 0 else False
-
-
-
-class Node():
-    def __init__(self, val, elev, parent, depth, g, h,children):
-        self.val = val
-        self.elev = elev
-        self.parent = parent
-        self.depth = depth
-        self.g = g
-        self.h = h
-        self.children = children
-
-    def __str__(self):
-        return str(self.val)
-
-    def __lt__(self, other):
-        return (self.g + self.h) < (other.g + other.h)
-
 with open('input4.txt', 'r') as f:
     line = f.readline()
     arr = [0]
@@ -327,15 +234,15 @@ elif algo == "ucs" or algo == "a*":
         start_node = (0+heuristic(x,y, target_x, target_y), (x,y), 0, heuristic(x,y, target_x, target_y))
         parent = { start_node[1]: None }
  
-        q = queue.PriorityQueue()
-        # q = []
+        # q = queue.PriorityQueue()
+        q = []
         # hmap = {}
         # q = MinHeap([])
         frontier = {}
         explored = set()
 
-        q.put(start_node)
-        # heapq.heappush(q, start_node)
+        # q.put(start_node)
+        heapq.heappush(q, start_node)
         # q.insert(start_node)
         frontier[start_node[1]] = start_node
         
@@ -345,12 +252,12 @@ elif algo == "ucs" or algo == "a*":
 
         foundNode = None
         counter = 0
-        while not q.empty():
+        while q:
             counter+=1
             # print(q.queue)
             # curr_node = q.remove()
-            curr_node = q.get()
-            # curr_node = heapq.heappop(q)
+            # curr_node = q.get()
+            curr_node = heapq.heappop(q)
             curr_x, curr_y = curr_node[1]
 
             if verbose:
@@ -375,8 +282,8 @@ elif algo == "ucs" or algo == "a*":
                 # if abs(curr_node.elev - child.elev) <= max_elev:
                 if (child[1] not in explored) and (child[1] not in frontier):
                     frontier[child[1]] = child
-                    # heapq.heappush(q, child)
-                    q.put(child)
+                    heapq.heappush(q, child)
+                    # q.put(child)
                     parent[child[1]] = curr_node[1]
                     
                 elif child[1] in frontier:
@@ -388,8 +295,8 @@ elif algo == "ucs" or algo == "a*":
                         # existing_child.h = child.h
                         # existing_child.children = child.children
                         frontier[child[1]] = child
-                        q.put(child)
-                        # heapq.heappush(q, child)
+                        # q.put(child)
+                        heapq.heappush(q, child)
                         parent[child[1]] = curr_node[1]
                         # heapq.heapify(q)
                         
@@ -404,8 +311,8 @@ elif algo == "ucs" or algo == "a*":
         else:
             tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
             
-            print("Queue size = ", q.qsize())
-            # print("Queue size = ", len(q))
+            # print("Queue size = ", q.qsize())
+            print("Queue size = ", len(q))
             print("Cost : ",foundNode[2])
 
             ans_arr = []

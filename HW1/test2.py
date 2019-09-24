@@ -47,7 +47,6 @@ class Node():
 
 class MinHeap:
     def __init__(self, array):
-        # Do not edit the line below.
         self.heap = self.buildHeap(array)
         self.idx_of_element = {}
     
@@ -61,7 +60,6 @@ class MinHeap:
         return idx * 2 + 2
 
     def buildHeap(self, array):
-        # Write your code here.
         lastIdx = len(array) - 1
         startFrom = self.getParentIdx(lastIdx)
         for i in range(startFrom, -1, -1):
@@ -70,7 +68,6 @@ class MinHeap:
 
     # this is min-heapify method
     def siftDown(self, idx, array):
-        # Write your code here.
         while True:
             l = self.getLeftChildIdx(idx)
             r = self.getRightChildIdx(idx)
@@ -89,7 +86,6 @@ class MinHeap:
                 break
 
     def siftUp(self, idx):
-        # Write your code here.
         p = self.getParentIdx(idx)
         while p >= 0 and self.heap[p] > self.heap[idx]:
             self.heap[p], self.heap[idx] = self.heap[idx], self.heap[p]
@@ -98,11 +94,9 @@ class MinHeap:
             p = self.getParentIdx(idx)
 
     def peek(self):
-        # Write your code here.
         return self.heap[0]
 
     def remove(self):
-        # Write your code here.
         self.heap[0], self.heap[-1] = self.heap[-1], self.heap[0]
         self.idx_of_element[self.heap[0][1]], self.idx_of_element[self.heap[-1][1]] = self.idx_of_element[self.heap[-1][1]], self.idx_of_element[self.heap[0][1]]
 
@@ -111,7 +105,6 @@ class MinHeap:
         return x
 
     def insert(self, value):
-        # Write your code here.
         self.heap.append(value)
         self.idx_of_element[value[1]] = len(self.heap) - 1
         self.siftUp(len(self.heap)-1)

@@ -1,12 +1,11 @@
 import queue
-from math import sqrt
-# import heapq
+import heapq
 import time
 
 start_time = time.time()
 verbose = False
 
-with open('input.txt', 'r') as f:
+with open('input4.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -27,6 +26,41 @@ surface = []
 for i in range(len(arr)-h, len(arr)):
     surface.append(list(map(int, arr[i].split())))
 
+# print()
+# print(arr)
+
+# print(algo)
+# print(w, h)
+# print(x, y)
+# print(max_elev)
+# print(target_sites)
+# for i in surface:
+#     print(i)
+
+# print(surface[330][121])
+# print(surface[331][121])
+# print(surface[332][121])
+# print(surface[333][121])
+
+
+def heuristic(x, y, target_x, target_y):
+    if algo == "ucs":
+    # if algo == "ucs" or algo == "a*":
+        return 0
+    else:
+        dx = abs(x-target_x)
+        dy = abs(y-target_y)
+        # manhattan_dist = abs(x-target_x) + abs(y-target_y)
+        # straight_line_dist = int(sqrt(abs(x-target_x)**2 + abs(y-target_y)**2)*10)
+        # elev_diff = abs(surface[y][x] - surface[target_y][target_x])
+        
+        diagonal_dist = 10*(dx + dy) + (14 - 2 * 10)*min(dx, dy)
+        
+        # return int(sqrt(elev_diff**2 + straight_line_dist**2))
+        # return (elev_diff + straight_line_dist)
+        # return straight_line_dist
+        # return manhattan_dist
+        return diagonal_dist
 
 def getNeighbours(x, y, w, h):
     neighbours = []
@@ -56,28 +90,6 @@ def getNeighbours(x, y, w, h):
     
     
     return neighbours
-
-
-def heuristic(x, y, target_x, target_y):
-    if algo == "ucs":
-    # if algo == "ucs" or algo == "a*":
-        return 0
-    else:
-        D = 10
-        D2 = 14
-        dx = abs(x-target_x)
-        dy = abs(y-target_y)
-        # manhattan_dist = abs(x-target_x) + abs(y-target_y)
-        # straight_line_dist = int(sqrt(abs(x-target_x)**2 + abs(y-target_y)**2)*10)
-        # elev_diff = abs(surface[y][x] - surface[target_y][target_x])
-        
-        diagonal_dist = D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
-        
-        # return int(sqrt(elev_diff**2 + straight_line_dist**2))
-        # return (elev_diff + straight_line_dist)
-        # return straight_line_dist
-        # return manhattan_dist
-        return diagonal_dist
 
 def get_chidlren_ucs_astart(parent, w, h, target_x, target_y, explored):
     x, y = parent[1]
@@ -135,20 +147,28 @@ if algo == "bfs":
         a, b = sites
 
         q = queue.Queue()
+        # q = []
+
         visited = set()
         parent = {}
 
         q.put([x, y])
+        # heapq.heappush(q, [x, y])
+
         visited.add((x, y))
         parent[(x,y)] = None
 
-        # counter = 0
+        counter = 0
+        cost = 0
         while True:
-            # counter += 1
+            counter += 1
             if q.empty():
+            # if not q:
                 # print("path doesnt exist")
                 break
             curr_x, curr_y = q.get()
+            # curr_x, curr_y = heapq.heappop(q)
+            cost+=1
             # print(parent)
             if curr_x == a and curr_y == b:
                 # print('path exist')
@@ -159,10 +179,11 @@ if algo == "bfs":
                 this_y = n[1]
                 if (this_x, this_y) not in visited and abs( surface[this_y][this_x] - surface[curr_y][curr_x]) <= max_elev:
                     q.put([this_x, this_y])
+                    # heapq.heappush(q, [this_x, this_y])
                     parent[(this_x, this_y)] = (curr_x, curr_y)
                     visited.add((this_x, this_y))
-        # print("Looped ", counter, "times")  
-
+        print("Looped ", counter, "times")  
+        # print()
         # print(visited)
         node = (a, b)
         if node not in parent:
@@ -173,7 +194,8 @@ if algo == "bfs":
             #     outputStr = "FAIL"
         else:
             print("q size = ", q.qsize())
-
+            # print("q size = ", len(q))
+            
             # outputStr = str(b)+","+str(a)
             # f.write(str(b)+","+str(a))
             ans_arr = []
@@ -188,6 +210,7 @@ if algo == "bfs":
             # if idx!=len(target_sites)-1:
             #     outputStr += "\n"
             # print(ans_arr)
+            print("cost = " , len(ans_arr))
             ans_arr = ans_arr[::-1]
             f.write(' '.join(ans_arr))
         # f.write(outputStr)
@@ -196,6 +219,7 @@ if algo == "bfs":
             f.write("\n")
     f.close()
 
+# def corr_tester(algo, sites):
 elif algo == "ucs" or algo == "a*":
     f = open('output.txt', 'w')
     for idx, sites in enumerate(target_sites):
@@ -209,24 +233,34 @@ elif algo == "ucs" or algo == "a*":
         start_node = (0+heuristic(x,y, target_x, target_y), (x,y), 0, heuristic(x,y, target_x, target_y))
         parent = { start_node[1]: None }
  
-        q = queue.PriorityQueue()
+        # q = queue.PriorityQueue()
+        q = []
+        # hmap = {}
+        # q = MinHeap([])
         frontier = {}
         explored = set()
 
-        q.put(start_node)
-        
+        # q.put(start_node)
+        heapq.heappush(q, start_node)
+        # q.insert(start_node)
         frontier[start_node[1]] = start_node
-    
+        
+
+        if verbose:
+            temp_explored = []
 
         foundNode = None
-        while not q.empty():
-            
+        counter = 0
+        while q:
+            counter+=1
             # print(q.queue)
             # curr_node = q.remove()
-            curr_node = q.get()
+            # curr_node = q.get()
+            curr_node = heapq.heappop(q)
             curr_x, curr_y = curr_node[1]
 
-            
+            if verbose:
+                temp_explored.append(curr_node[1])
             # print(curr_node.val)
 
             # if curr_node.val not in frontier:
@@ -247,8 +281,8 @@ elif algo == "ucs" or algo == "a*":
                 # if abs(curr_node.elev - child.elev) <= max_elev:
                 if (child[1] not in explored) and (child[1] not in frontier):
                     frontier[child[1]] = child
-                    # heapq.heappush(q, child)
-                    q.put(child)
+                    heapq.heappush(q, child)
+                    # q.put(child)
                     parent[child[1]] = curr_node[1]
                     
                 elif child[1] in frontier:
@@ -260,7 +294,8 @@ elif algo == "ucs" or algo == "a*":
                         # existing_child.h = child.h
                         # existing_child.children = child.children
                         frontier[child[1]] = child
-                        q.put(child)
+                        # q.put(child)
+                        heapq.heappush(q, child)
                         parent[child[1]] = curr_node[1]
                         # heapq.heapify(q)
                         
@@ -268,15 +303,16 @@ elif algo == "ucs" or algo == "a*":
                 
                 # if path doesnt exist there is no way to 
                 # terminate the code
-       
+        print("Looped ", counter, "times")
         if not foundNode:
             f.write('FAIL')
             # print('FAIL')
         else:
-            # tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
+            tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
             
             # print("Queue size = ", q.qsize())
-            # print("Cost : ",foundNode[2])
+            print("Queue size = ", len(q))
+            print("Cost : ",foundNode[2])
 
             ans_arr = []
             ans_arr.append(str(target_x)+","+str(target_y))
@@ -284,15 +320,32 @@ elif algo == "ucs" or algo == "a*":
             
 
             pathNode = parent[foundNode[1]]
-            
+            if verbose:
+                tempMap[foundNode[1][1]][foundNode[1][0]] = '*'
+                print(foundNode[1])
+
             while pathNode:
+                if verbose:
+                    print(pathNode)
+                    tempMap[pathNode[1]][pathNode[0]] = '-'
                 ans_arr.append(str(pathNode[0])+","+str(pathNode[1]))
                 pathNode = parent[pathNode]
             
             ans_arr = ans_arr[::-1]
             f.write(' '.join(ans_arr))
 
-           
+            if verbose:
+                for ro in tempMap:
+                    print('  '.join(ro))
+                
+                tempMap = [ ['0' for _ in range(w)] for _ in range(h)]
+                for i in temp_explored:
+                    tempMap[i[1]][i[0]] = '-'
+                print('--------')
+                for ro in tempMap:
+                    print('  '.join(ro))
         if idx!=len(target_sites)-1:
             f.write("\n")
     f.close()
+
+print(time.time() - start_time, "seconds")
