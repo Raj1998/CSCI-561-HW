@@ -6,7 +6,7 @@ import time
 start_time = time.time()
 verbose = False
 
-with open('input4.txt', 'r') as f:
+with open('input.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -63,31 +63,31 @@ def heuristic(x, y, target_x, target_y):
         # return manhattan_dist
         return diagonal_dist
 
-def getNeighbours(x, y, w, h):
+def getNeighbours(x, y, w, h, visited):
     neighbours = []
-    if 0 <= y-1 < h:
-        neighbours.append([x, y-1])
-    if 0 <= x+1 < w and 0 <= y-1 < h:
-        neighbours.append([x+1, y-1])
-    if 0 <= x+1 < w:
-        neighbours.append([x+1, y])
-    if 0 <= x+1 < w and 0 <= y+1 < h:
-        neighbours.append([x+1, y+1])
-    if 0 <= y+1 < h:
-        neighbours.append([x, y+1])
-    if 0 <= x-1 < w and 0 <= y+1 < h:
-        neighbours.append([x-1, y+1])
-    if 0 <= x-1 < w:
-        neighbours.append([x-1, y])
-    if 0 <= x-1 < w and 0 <= y-1 < h:
-        neighbours.append([x-1, y-1])
-    # xx = x
-    # yy = y
-    # for i in range(x-1, x+2):
-    #     for j in range(y-1, y+2):
-    #         if i != xx or j != y:
-    #             if 0 <= i < w and 0 <= j < h:
-    #                 neighbours.append([i, j])
+    # if 0 <= y-1 < h and (x, y-1) not in visited and abs( surface[y-1][x] - surface[y][x]) <= max_elev:
+    #     neighbours.append([x, y-1])
+    # if 0 <= x+1 < w and 0 <= y-1 < h and (x+1, y-1) not in visited and abs( surface[y-1][x+1] - surface[y][x]) <= max_elev:
+    #     neighbours.append([x+1, y-1])
+    # if 0 <= x+1 < w and (x+1, y) not in visited and abs( surface[y][x+1] - surface[y][x]) <= max_elev:
+    #     neighbours.append([x+1, y])
+    # if 0 <= x+1 < w and 0 <= y+1 < h and (x+1, y+1) not in visited and abs( surface[y+1][x+1] - surface[y][x]) <= max_elev:
+    #     neighbours.append([x+1, y+1])
+    # if 0 <= y+1 < h and (x, y+1) not in visited and abs( surface[y+1][x] - surface[y][x]) <= max_elev:
+    #     neighbours.append([x, y+1])
+    # if 0 <= x-1 < w and 0 <= y+1 < h and (x-1, y+1) not in visited and abs( surface[y+1][x-1] - surface[y][x]) <= max_elev:
+    #     neighbours.append([x-1, y+1])
+    # if 0 <= x-1 < w and (x-1, y) not in visited and abs( surface[y][x-1] - surface[y][x]) <= max_elev:
+    #     neighbours.append([x-1, y])
+    # if 0 <= x-1 < w and 0 <= y-1 < h and (x-1, y-1) not in visited and abs( surface[y-1][x-1] - surface[y][x]) <= max_elev:
+    #     neighbours.append([x-1, y-1])
+    xx = x
+    yy = y
+    for i in range(x-1, x+2):
+        for j in range(y-1, y+2):
+            if i != xx or j != yy:
+                if (0 <= i < w and 0 <= j < h) and (i, j) not in visited and abs( surface[j][i] - surface[y][x]) <= max_elev:
+                    neighbours.append([i, j])
     
     
     return neighbours
@@ -174,15 +174,15 @@ if algo == "bfs":
             if curr_x == a and curr_y == b:
                 # print('path exist')
                 break
-            neighbours = getNeighbours(curr_x, curr_y, w, h)
+            neighbours = getNeighbours(curr_x, curr_y, w, h, visited)
             for n in neighbours:
                 this_x = n[0]
                 this_y = n[1]
-                if (this_x, this_y) not in visited and abs( surface[this_y][this_x] - surface[curr_y][curr_x]) <= max_elev:
-                    q.put([this_x, this_y])
-                    # heapq.heappush(q, [this_x, this_y])
-                    parent[(this_x, this_y)] = (curr_x, curr_y)
-                    visited.add((this_x, this_y))
+                # if (this_x, this_y) not in visited and abs( surface[this_y][this_x] - surface[curr_y][curr_x]) <= max_elev:
+                q.put([this_x, this_y])
+                # heapq.heappush(q, [this_x, this_y])
+                parent[(this_x, this_y)] = (curr_x, curr_y)
+                visited.add((this_x, this_y))
         print("Looped ", counter, "times")  
         # print()
         # print(visited)
