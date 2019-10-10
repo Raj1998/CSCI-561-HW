@@ -1,7 +1,8 @@
-Todo:
+Todo and notes:
 
-- refactor the queue items as node and states
-- min heap 
+- hw_without_node_class_heapq.py
+is the final file for submition. 
+
 - Efficient string concat https://waymoot.org/home/python_string/
 
 >>> x
