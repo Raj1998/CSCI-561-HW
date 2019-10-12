@@ -30,6 +30,7 @@ class MinMax:
         self.color = color
         self.board_mm = copy.deepcopy(board)
         self.nodes_searched = 0
+        self.nodes_searched_ab = 0
     
     # def get_best_move(self, board):
     #     total_moves_available()
@@ -46,7 +47,8 @@ class MinMax:
 
         for action in possible_moves:
             new_board = update_board(action, self.board_mm)
-            
+            # print_board(new_board)
+            # input()
             expanded_v, expanded_move = self.min_max(curr_depth+1, not is_max_player, new_board)
 
             if is_max_player and expanded_v > v:
@@ -56,6 +58,38 @@ class MinMax:
             elif (not is_max_player) and expanded_v < v:
                 v = expanded_v
                 selected_move = expanded_move
+
+        return v, selected_move
+
+    def min_max_ab(self, curr_depth, is_max_player, board, alpha, beta):
+        self.nodes_searched_ab += 1
+        if curr_depth == self.max_depth:
+            # or termination condition
+            m = total_moves_available(board)
+            return len(m), ""
+        
+        possible_moves = total_moves_available(self.board_mm)
+        v = float('-inf') if is_max_player else float('inf')
+        selected_move = ""
+
+        for action in possible_moves:
+            new_board = update_board(action, self.board_mm)
+            
+            expanded_v, expanded_move = self.min_max_ab(curr_depth+1, not is_max_player, new_board, alpha, beta)
+
+            if is_max_player and expanded_v > v:
+                v = expanded_v
+                selected_move = expanded_move
+                alpha = max(alpha, v)
+                if alpha >= beta:
+                    break
+
+            elif (not is_max_player) and expanded_v < v:
+                v = expanded_v
+                selected_move = expanded_move
+                beta = min(beta, v)
+                if alpha >= beta:
+                    break
 
         return v, selected_move
 
@@ -121,7 +155,6 @@ print(moves)
 print(visited)
 
 def total_moves_available(board):
-    total_moves = 0
     # moves_dict = {}
     list_of_moves = []
     for i in range(256):
@@ -133,7 +166,7 @@ def total_moves_available(board):
             moves = []
             visited = {}
             make_jumps(ro, col, moves, visited)
-            total_moves += len(moves)
+            
             # moves_dict[(ro, col)] = moves
 
             for inner_moves in moves:
@@ -164,8 +197,9 @@ def update_board_tester():
 
 # update_board_tester()
 
-mm = MinMax(4, "W", board)
-raj, priya = mm.min_max(0, True, board)
+mm = MinMax(5, "W", board)
+# raj, priya = mm.min_max(0, True, board)
+raj, priya = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
 
 print(raj, priya)
-print(mm.nodes_searched)
+print(mm.nodes_searched_ab)
