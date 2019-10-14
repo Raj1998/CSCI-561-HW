@@ -5,6 +5,12 @@
 #     # do whatever you do
 #     print(';;;')
 
-f= "Fe"
-s = f"raj {str(33)}"
-print(s)
+
+def f(n):
+    if n == 3:
+        return True, "B"
+    else:
+        return False, None
+
+if f(3)[0]:
+    print("fff")
