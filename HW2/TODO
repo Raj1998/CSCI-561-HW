@@ -1,5 +1,6 @@
 Player turn by turn
-Termination condition
+done - Termination condition
 
-Available moves are not counting single moves i.e, 8 adjacent moves
+done - Available moves are not counting single moves i.e, 8 adjacent moves
 
+update board ratings for stuck in conditions for same values in the adjacent places
