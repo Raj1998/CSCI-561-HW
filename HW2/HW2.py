@@ -1,7 +1,9 @@
 import copy
 import time
 
-with open('input.txt', 'r') as f:
+import board_rating
+
+with open('input0.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -43,6 +45,8 @@ class MinMax:
             return m, ""
         
         possible_moves = total_moves_available(board, self.curr_player)
+        if len(possible_moves) == 0:
+            print("ran out of moves !!!")
         v = float('-inf') if is_max_player else float('inf')
         selected_move = ""
         self.curr_player = other_player(self.curr_player)
@@ -67,17 +71,19 @@ class MinMax:
 
     def min_max_ab(self, curr_depth, is_max_player, board, alpha, beta):
         self.nodes_searched_ab += 1
-        if curr_depth == self.max_depth:
+        is_game_end, _ = terminal_test(board)
+        if (curr_depth == self.max_depth) or (is_game_end):
             # or termination condition
-            m = total_moves_available(board, self.curr_player)
-            return len(m), ""
+            m = evaluate_board(board, self.color)
+            return m, ""
         
         possible_moves = total_moves_available(board, self.curr_player)
         v = float('-inf') if is_max_player else float('inf')
         selected_move = ""
+        self.curr_player = other_player(self.curr_player)
 
         for action in possible_moves:
-            new_board = update_board(action, self.board_mm)
+            new_board = update_board(action, board)
             
             expanded_v, _ = self.min_max_ab(curr_depth+1, not is_max_player, new_board, alpha, beta)
 
@@ -115,7 +121,7 @@ def print_board(board):
 
 print_board(board)
 
-def one_move(from_x, from_y):
+def one_move(board, from_x, from_y):
     # assert (board[from_x][from_y] == "."), "No Piece on this spot"
     moves = []
     for i in range(from_x-1, from_x+2):
@@ -124,11 +130,12 @@ def one_move(from_x, from_y):
                     0 <= j < BOARD_SIZE_Y and
                     (not(i == from_x and j == from_y)) and
                     board[i][j] == '.'):
-                moves.append([i, j])
+                s = f"{str(from_x)},{str(from_y)}-{str(i)},{str(j)}"
+                moves.append(s)
     
     return moves
 
-def make_jumps(from_x, from_y, moves, visited):
+def make_jumps(board, from_x, from_y, moves, visited):
     # moves = []
     for i in range(from_x-1, from_x+2):
         for j in range(from_y-1, from_y+2):
@@ -145,22 +152,22 @@ def make_jumps(from_x, from_y, moves, visited):
                     if (jumped_x, jumped_y) not in visited:
                         visited[(jumped_x, jumped_y)] = (from_x, from_y)
                         moves.append([jumped_x, jumped_y])
-                        make_jumps(jumped_x, jumped_y, moves, visited)
+                        make_jumps(board, jumped_x, jumped_y, moves, visited)
     
     # return moves
 
 
-# print(one_move(0, 0))
+# print(one_move(2, 2))
 
 # moves = []
 # visited = {}
-# make_jumps(0, 3, moves, visited)
+# make_jumps(2, 2, moves, visited)
 # print(moves)
 # print(visited)
 
 def total_moves_available(board, player):
     """
-    returns - all the jump moves
+    returns - all the jump moves + single_moves
     """
     # moves_dict = {}
     list_of_moves = []
@@ -172,20 +179,28 @@ def total_moves_available(board, player):
             
             moves = []
             visited = {}
-            make_jumps(ro, col, moves, visited)
+            make_jumps(board, ro, col, moves, visited)
             
             # moves_dict[(ro, col)] = moves
 
             for inner_moves in moves:
                 s = f"{str(ro)},{str(col)}-{str(inner_moves[0])},{str(inner_moves[1])}"
                 list_of_moves.append(s)
+            
+            # 8 single moves
+            single_moves = one_move(board, ro, col)
+            for i in single_moves:
+                list_of_moves.append(i)
     
     # print(total_moves, moves_dict)
+    
+    
+    
     return list_of_moves
     # return total_moves
 
 # player = "B"
-# print(len(total_moves_available(board, player)))
+# print((total_moves_available(board, player)))
 
 
 def update_board(action, board):
@@ -257,12 +272,14 @@ def evaluate_board(board, player):
     is_game_end, winning_player = terminal_test(board)
     if is_game_end:
         if winning_player == player:
-            return 2000
+            return 5000
         elif winning_player == other_player(player):
-            return -2000
+            return -5000
     
-    m = total_moves_available(board, player)
-    return len(m)
+    score = 0
+    score += board_rating.rating(board, player)
+    # score = total_moves_available(board, player)
+    return score
 
 
 def action_switcher(action):
@@ -283,18 +300,49 @@ def other_player(color):
 
 # print(other_player("W"))
 
+# print(board_rating.rating(board, "W"))
 
-mm = MinMax(3, "B", board)
 
-start_time = time.time()
-v, move = mm.min_max(0, True, board)
-print(mm.nodes_searched)
-print("Time taken: ", time.time() - start_time)
-print(v, move)
 
-# mm.curr_player = "W"
+# mm = MinMax(3, "B", board)
+
+# start_time = time.time()
+# v, move = mm.min_max(0, True, board)
+# print(mm.nodes_searched)
+# print("Time taken: ", time.time() - start_time)
+# print(v, move)
+
+
+# mm = MinMax(3, "B", board)
+
 # start_time = time.time()
 # v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
 # print(mm.nodes_searched_ab)
 # print("Time taken: ", time.time() - start_time)
 # print(v, move)
+
+
+
+def play_game(board):
+    c_p = "B"
+    # is_mx = True
+    while True:
+        # os.system('clear')
+        mm = MinMax(2, c_p, board)
+
+        # start_time = time.time()
+        v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
+        # print(mm.nodes_searched_ab)
+        print(v, move, " - ", c_p)
+        
+        board = update_board(move, board)
+
+        # is_mx = not is_mx
+        c_p = other_player(c_p)
+
+        print_board(board)
+
+
+        # input()
+
+play_game(board)
