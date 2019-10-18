@@ -13,7 +13,8 @@ with open('input0.txt', 'r') as f:
 game = arr[1].lower()
 color = arr[2].lower()
 rem_time = float(arr[3])
-board = [ list(i) for i in arr[4:] ]
+# board = [ list(i) for i in arr[4:] ]
+board = [['.', '.', '.', '.', '.', '.', '.', '.', 'B', '.', 'B', 'W', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'B', 'B', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'W', '.', '.', '.', '.'], ['.', '.', '.', 'W', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'B'], ['.', '.', '.', '.', '.', '.', '.', 'B', 'B', '.', '.', '.', '.', '.', '.', '.'], ['.', '.', '.', 'B', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'], ['W', 'W', '.', '.', '.', '.', '.', 'W', '.', 'W', '.', '.', '.', '.', 'W', '.'], ['.', '.', '.', '.', '.', '.', 'B', '.', '.', '.', '.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'W', 'W', '.', 'W'], ['.', '.', 'B', '.', '.', '.', '.', '.', '.', '.', 'W', '.', '.', 'B', 'B', '.'], ['.', '.', '.', '.', 'B', '.', '.', '.', '.', 'W', '.', '.', '.', '.', '.', '.'], ['B', 'B', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'W', '.', '.', '.'], ['.', '.', 'W', '.', '.', 'B', '.', '.', 'B', '.', '.', '.', '.', '.', '.', '.'], ['.', 'W', '.', 'B', '.', '.', '.', 'W', 'W', '.', '.', '.', 'W', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'B', '.']]
 BOARD_SIZE_X = 16
 BOARD_SIZE_Y = 16
 
@@ -325,14 +326,21 @@ def other_player(color):
 
 def play_game(board):
     c_p = "B"
+    b_moves = 0
+    w_moves = 0
+    counter = 0
     # is_mx = True
     while True:
         # os.system('clear')
-        mm = MinMax(2, c_p, board)
+        b_moves=b_moves+ 1 if c_p == "B" else b_moves
+        w_moves= w_moves+ 1 if c_p == "W" else w_moves
+        counter+=1
+        mm = MinMax(1, c_p, board)
 
-        # start_time = time.time()
-        v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
-        # print(mm.nodes_searched_ab)
+        start_time = time.time()
+        v, move = mm.min_max(0, True, board)
+        print(mm.nodes_searched_ab)
+        print("Time taken: ", time.time() - start_time)
         print(v, move, " - ", c_p)
         
         board = update_board(move, board)
@@ -341,8 +349,9 @@ def play_game(board):
         c_p = other_player(c_p)
 
         print_board(board)
-
-
+        print("count",counter)
+        print(b_moves, w_moves)
+        # time.sleep(1)
         # input()
 
 play_game(board)

@@ -4,3 +4,5 @@ done - Termination condition
 done - Available moves are not counting single moves i.e, 8 adjacent moves
 
 update board ratings for stuck in conditions for same values in the adjacent places
+
+termination condition is breaking on update_board() line 210
