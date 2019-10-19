@@ -13,8 +13,8 @@ with open('input0.txt', 'r') as f:
 game = arr[1].lower()
 color = arr[2].lower()
 rem_time = float(arr[3])
-board = [ list(i) for i in arr[4:] ]
-# board = [['.', '.', 'W', 'B', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'], ['B', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'B', '.', '.'], ['.', '.', '.', '.', 'W', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'W', '.', '.'], ['.', '.', 'W', 'B', '.', '.', '.', '.', 'B', '.', '.', '.', '.', '.', '.', '.'], ['B', '.', '.', '.', 'W', '.', '.', '.', '.', '.', '.', '.', '.', 'W', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'], ['.', 'W', '.', '.', 'B', '.', '.', '.', '.', '.', '.', 'W', '.', '.', '.', '.'], ['B', '.', 'W', 'B', 'B', '.', '.', '.', '.', '.', '.', 'W', 'B', '.', '.', '.'], ['.', '.', 'W', '.', '.', '.', '.', '.', '.', '.', 'B', '.', '.', '.', '.', '.'], ['.', 'W', '.', '.', 'W', '.', '.', 'B', '.', '.', '.', '.', '.', '.', '.', '.'], ['W', '.', 'B', '.', '.', '.', '.', '.', '.', 'W', '.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', 'B', '.', '.', '.', '.', 'W', 'B', '.', '.', 'B', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', 'W', '.', '.', 'B', '.', '.', 'W', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'W', '.', 'B', '.', '.', '.']]
+# board = [ list(i) for i in arr[4:] ]
+board = [['.', '.', 'W', 'B', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'], ['B', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'B', '.', '.'], ['.', '.', '.', '.', 'W', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'W', '.', '.'], ['.', '.', 'W', 'B', '.', '.', '.', '.', 'B', '.', '.', '.', '.', '.', '.', '.'], ['B', '.', '.', '.', 'W', '.', '.', '.', '.', '.', '.', '.', '.', 'W', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'], ['.', 'W', '.', '.', 'B', '.', '.', '.', '.', '.', '.', 'W', '.', '.', '.', '.'], ['B', '.', 'W', 'B', 'B', '.', '.', '.', '.', '.', '.', 'W', 'B', '.', '.', '.'], ['.', '.', 'W', '.', '.', '.', '.', '.', '.', '.', 'B', '.', '.', '.', '.', '.'], ['.', 'W', '.', '.', 'W', '.', '.', 'B', '.', '.', '.', '.', '.', '.', '.', '.'], ['W', '.', 'B', '.', '.', '.', '.', '.', '.', 'W', '.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', 'B', '.', '.', '.', '.', 'W', 'B', '.', '.', 'B', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', 'W', '.', '.', 'B', '.', '.', 'W', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'W', '.', 'B', '.', '.', '.']]
 BOARD_SIZE_X = 16
 BOARD_SIZE_Y = 16
 
@@ -37,40 +37,40 @@ class MinMax:
         self.nodes_searched = 0
         self.nodes_searched_ab = 0
     
-    def min_max(self, curr_depth, is_max_player, board):
-        self.nodes_searched += 1
-        is_game_end, _ = terminal_test(board)
-        if (curr_depth == self.max_depth) or (is_game_end):
-            # print("BASE CASE ---- ", winning_player)   
-            m = evaluate_board(board, self.color)
-            return m, ""
+    # def min_max(self, curr_depth, is_max_player, board):
+    #     self.nodes_searched += 1
+    #     is_game_end, _ = terminal_test(board)
+    #     if (curr_depth == self.max_depth) or (is_game_end):
+    #         # print("BASE CASE ---- ", winning_player)   
+    #         m = evaluate_board(board, self.color)
+    #         return m, ""
         
-        possible_moves = total_moves_available(board, self.curr_player)
-        if len(possible_moves) == 0:
-            print("ran out of moves !!!")
-        v = float('-inf') if is_max_player else float('inf')
-        selected_move = ""
-        self.curr_player = other_player(self.curr_player)
+    #     possible_moves = total_moves_available(board, self.curr_player)
+    #     if len(possible_moves) == 0:
+    #         print("ran out of moves !!!")
+    #     v = float('-inf') if is_max_player else float('inf')
+    #     selected_move = ""
+    #     self.curr_player = other_player(self.curr_player)
 
-        for action in possible_moves:
-            new_board = update_board(action, board)
-            # print_board(new_board)
-            # print(self.curr_player, is_max_player, action, curr_depth, len(possible_moves))
-            # input()
+    #     for action in possible_moves:
+    #         new_board = update_board(action, board)
+    #         # print_board(new_board)
+    #         # print(self.curr_player, is_max_player, action, curr_depth, len(possible_moves))
+    #         # input()
 
-            expanded_v, _ = self.min_max(curr_depth+1, not is_max_player, new_board)
+    #         expanded_v, _ = self.min_max(curr_depth+1, not is_max_player, new_board)
 
-            if is_max_player and expanded_v > v:
-                v = expanded_v
-                selected_move = action
+    #         if is_max_player and expanded_v > v:
+    #             v = expanded_v
+    #             selected_move = action
             
-            elif (not is_max_player) and expanded_v < v:
-                v = expanded_v
-                selected_move = action
+    #         elif (not is_max_player) and expanded_v < v:
+    #             v = expanded_v
+    #             selected_move = action
             
-        return v, selected_move
+    #     return v, selected_move
 
-    def min_max_ab(self, curr_depth, is_max_player, board, alpha, beta):
+    def min_max_ab(self, curr_depth, is_max_player, alpha, beta):
         self.nodes_searched_ab += 1
         is_game_end, _ = terminal_test(board)
         if (curr_depth == self.max_depth) or (is_game_end):
@@ -84,9 +84,10 @@ class MinMax:
         self.curr_player = other_player(self.curr_player)
 
         for action in possible_moves:
-            new_board = update_board(action, board)
+            update_board(action, self.board_mm)
             
-            expanded_v, _ = self.min_max_ab(curr_depth+1, not is_max_player, new_board, alpha, beta)
+            expanded_v, _ = self.min_max_ab(curr_depth+1, not is_max_player, alpha, beta)
+            update_board(action_switcher(action), self.board_mm)
 
             if is_max_player and expanded_v > v:
                 v = expanded_v
@@ -211,10 +212,9 @@ def update_board(action, board):
     from_, to_ = action.split("-")
     x, y = list(map(int, from_.split(",")))
     new_x, new_y = list(map(int, to_.split(",")))
-    new_board = copy.deepcopy(board)
+    # board = copy.deepcopy(board)
     
-    new_board[x][y], new_board[new_x][new_y] = new_board[new_x][new_y], new_board[x][y]
-    return new_board
+    board[x][y], board[new_x][new_y] = board[new_x][new_y], board[x][y]
 
 def update_board_tester():
     print_board(update_board("2,1-4,3", board))
@@ -314,10 +314,10 @@ def other_player(color):
 # print(v, move)
 
 
-# mm = MinMax(2, "B", board)
+# mm = MinMax(3, "B", board)
 
 # start_time = time.time()
-# v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
+# v, move = mm.min_max_ab(0, True, float("-inf"), float("inf"))
 # print(mm.nodes_searched_ab)
 # print("Time taken: ", time.time() - start_time)
 # print(v, move)
@@ -334,16 +334,15 @@ def play_game(board):
         b_moves=b_moves+ 1 if c_p == "B" else b_moves
         w_moves= w_moves+ 1 if c_p == "W" else w_moves
         
-        mm = MinMax(1, c_p, board)
+        mm = MinMax(3, c_p, board)
 
         start_time = time.time()
-        v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
-        # v, move = mm.min_max(0, True, board)
+        v, move = mm.min_max_ab(0, True, float("-inf"), float("inf"))
         print(mm.nodes_searched_ab)
         print("Time taken: ", time.time() - start_time)
         print(v, move, " - ", c_p)
         
-        board = update_board(move, board)
+        update_board(move, board)
 
         # is_mx = not is_mx
         c_p = other_player(c_p)

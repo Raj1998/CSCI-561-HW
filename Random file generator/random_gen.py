@@ -6,14 +6,14 @@ count = 0
 while count < 19:
     x, y = random.randint(0, 15), random.randint(0, 15)
     if board[x][y] == ".":
-        board[x][y] = "B"
+        board[x][y] = "W"
         count+=1
 
 count = 0
 while count < 19:
     x, y = random.randint(0, 15), random.randint(0, 15)
     if board[x][y] == ".":
-        board[x][y] = "W"
+        board[x][y] = "B"
         count+=1
 for b in board:
     print(b)
