@@ -3,7 +3,7 @@ import time
 
 import board_rating
 
-with open('input0.txt', 'r') as f:
+with open('input3.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -208,6 +208,7 @@ def update_board(action, board):
     """
     returns deepcopy of the board with updated 
     """
+    # print("action==", action)
     from_, to_ = action.split("-")
     x, y = list(map(int, from_.split(",")))
     new_x, new_y = list(map(int, to_.split(",")))
@@ -301,9 +302,27 @@ def other_player(color):
 
 # print(other_player("W"))
 
+def get_letter(color):
+    if color == "black":
+        return "B"
+    elif color == "white":
+        return "W"
+
 # print(board_rating.rating(board, "W"))
 
 
+def is_E_move(from_x, from_y, to_x, to_y):
+    if abs(from_x - to_x) >= 2 or abs(from_y - to_y) >= 2:
+        # print('nahi')
+        return False
+    else:
+        # print('hai')
+        return True
+
+def is_E_move_tester():
+    print(is_E_move(3,5, 4,6))
+
+is_E_move_tester()
 
 # mm = MinMax(3, "B", board)
 
@@ -314,13 +333,54 @@ def other_player(color):
 # print(v, move)
 
 
-# mm = MinMax(2, "B", board)
 
-# start_time = time.time()
-# v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
-# print(mm.nodes_searched_ab)
-# print("Time taken: ", time.time() - start_time)
-# print(v, move)
+print(color)
+mm = MinMax(2, get_letter(color), board)
+
+start_time = time.time()
+v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
+print(mm.nodes_searched_ab)
+print("Time taken: ", time.time() - start_time)
+print(v, move)
+
+with open("output.txt", "w") as m_file:
+    from_x, from_y = list(map(int, move.split('-')[0].split(',')))
+    to_x, to_y = list(map(int, move.split('-')[1].split(',')))
+    if is_E_move(from_x, from_y, to_x, to_y):
+        answer = f"E {from_y},{from_x} {to_y},{to_x}"
+        m_file.write(answer)
+    else:
+        m_moves = []
+        m_visited = {}
+        make_jumps(board, from_x, from_y, m_moves, m_visited)
+        print(m_moves)
+        print(m_visited)
+
+        m_path = []
+        parent = (to_x, to_y)
+        while parent != (from_x, from_y):
+            curr = list(reversed(list(parent)))
+            curr_p = list(reversed(list(m_visited[parent])))
+            
+            curr = list(map(str, curr))
+            curr_p = list(map(str, curr_p))
+
+            curr = ','.join(curr)
+            curr_p = ','.join(curr_p)
+            
+            print(parent, m_visited[parent])
+            m_path.append( "J "+ curr_p+" "+curr )
+
+            parent = m_visited[(parent)]
+        print(m_path)
+
+        o_str = ""
+        for i in range(len(m_path)-1, -1, -1):
+            m_file.write(m_path[i])
+            if i!=0:
+                m_file.write("\n")
+
+
 
 
 
@@ -343,6 +403,10 @@ def play_game(board):
         print("Time taken: ", time.time() - start_time)
         print(v, move, " - ", c_p)
         
+        if not move:
+            print('winner is ', c_p)
+            return
+        
         board = update_board(move, board)
 
         # is_mx = not is_mx
@@ -353,4 +417,4 @@ def play_game(board):
         # time.sleep(0.1)
         # input()
 
-play_game(board)
+# play_game(board)
