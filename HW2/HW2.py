@@ -3,7 +3,7 @@ import time
 
 import board_rating
 
-with open('input3.txt', 'r') as f:
+with open('input0.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -322,7 +322,47 @@ def is_E_move(from_x, from_y, to_x, to_y):
 def is_E_move_tester():
     print(is_E_move(3,5, 4,6))
 
-is_E_move_tester()
+# is_E_move_tester()
+
+def output_writer():
+    with open("output.txt", "w") as m_file:
+        from_x, from_y = list(map(int, move.split('-')[0].split(',')))
+        to_x, to_y = list(map(int, move.split('-')[1].split(',')))
+        if is_E_move(from_x, from_y, to_x, to_y):
+            answer = f"E {from_y},{from_x} {to_y},{to_x}"
+            m_file.write(answer)
+        else:
+            m_moves = []
+            m_visited = {}
+            make_jumps(board, from_x, from_y, m_moves, m_visited)
+            print(m_moves)
+            print(m_visited)
+
+            m_path = []
+            parent = (to_x, to_y)
+            while parent != (from_x, from_y):
+                curr = list(reversed(list(parent)))
+                curr_p = list(reversed(list(m_visited[parent])))
+                
+                curr = list(map(str, curr))
+                curr_p = list(map(str, curr_p))
+
+                curr = ','.join(curr)
+                curr_p = ','.join(curr_p)
+                
+                print(parent, m_visited[parent])
+                m_path.append( "J "+ curr_p+" "+curr )
+
+                parent = m_visited[(parent)]
+            print(m_path)
+
+            for i in range(len(m_path)-1, -1, -1):
+                m_file.write(m_path[i])
+                if i!=0:
+                    m_file.write("\n")
+
+
+
 
 # mm = MinMax(3, "B", board)
 
@@ -333,59 +373,18 @@ is_E_move_tester()
 # print(v, move)
 
 
-
-print(color)
-mm = MinMax(2, get_letter(color), board)
+mm = MinMax(1, get_letter(color), board)
 
 start_time = time.time()
 v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
-print(mm.nodes_searched_ab)
+print("Nodes searched:", mm.nodes_searched_ab)
 print("Time taken: ", time.time() - start_time)
-print(v, move)
+print("Score: ",v, "| Move: ", move)
 
-with open("output.txt", "w") as m_file:
-    from_x, from_y = list(map(int, move.split('-')[0].split(',')))
-    to_x, to_y = list(map(int, move.split('-')[1].split(',')))
-    if is_E_move(from_x, from_y, to_x, to_y):
-        answer = f"E {from_y},{from_x} {to_y},{to_x}"
-        m_file.write(answer)
-    else:
-        m_moves = []
-        m_visited = {}
-        make_jumps(board, from_x, from_y, m_moves, m_visited)
-        print(m_moves)
-        print(m_visited)
-
-        m_path = []
-        parent = (to_x, to_y)
-        while parent != (from_x, from_y):
-            curr = list(reversed(list(parent)))
-            curr_p = list(reversed(list(m_visited[parent])))
-            
-            curr = list(map(str, curr))
-            curr_p = list(map(str, curr_p))
-
-            curr = ','.join(curr)
-            curr_p = ','.join(curr_p)
-            
-            print(parent, m_visited[parent])
-            m_path.append( "J "+ curr_p+" "+curr )
-
-            parent = m_visited[(parent)]
-        print(m_path)
-
-        o_str = ""
-        for i in range(len(m_path)-1, -1, -1):
-            m_file.write(m_path[i])
-            if i!=0:
-                m_file.write("\n")
-
-
-
-
+output_writer()
 
 def play_game(board):
-    c_p = "B"
+    c_p = "W"
     b_moves = 0
     w_moves = 0
     # is_mx = True
@@ -415,6 +414,8 @@ def play_game(board):
         print_board(board)
         print(b_moves, w_moves)
         # time.sleep(0.1)
-        # input()
+        input()
 
-# play_game(board)
+strt_tm = time.time()
+play_game(board)
+print("Total ---- Time taken: ", time.time() - strt_tm)
