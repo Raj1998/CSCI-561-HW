@@ -1,10 +1,10 @@
 import copy
 import time
-import random
+# import random
 
 import board_rating
 
-with open('input6.txt', 'r') as f:
+with open('input.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -127,7 +127,7 @@ def print_board(board):
         print(i%10, " ", end="")
     print()
 
-print_board(board)
+# print_board(board)
 
 def one_move(board, from_x, from_y):
     # assert (board[from_x][from_y] == "."), "No Piece on this spot"
@@ -408,13 +408,13 @@ def output_writer(move):
 
 mm = MinMax(2, get_letter(color), board)
 
-# start_time = time.time()
-# v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
+start_time = time.time()
+v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
 # print("Nodes searched:", mm.nodes_searched_ab)
 # print("Time taken: ", time.time() - start_time)
 # print("Score: ",v, "| Move: ", move)
 
-# output_writer(move)
+output_writer(move)
 
 def play_game(board):
     c_p = "W"
@@ -425,7 +425,7 @@ def play_game(board):
         b_moves=b_moves+ 1 if c_p == "B" else b_moves
         w_moves= w_moves+ 1 if c_p == "W" else w_moves
         
-        mm = MinMax(1, c_p, board)
+        mm = MinMax(2, c_p, board)
 
         start_time = time.time()
         v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
@@ -448,6 +448,6 @@ def play_game(board):
         # time.sleep(0.3)
         # input()
 
-strt_tm = time.time()
-play_game(board)
-print("Total ---- Time taken: ", time.time() - strt_tm)
+# strt_tm = time.time()
+# # play_game(board)
+# print("Total ---- Time taken: ", time.time() - strt_tm)

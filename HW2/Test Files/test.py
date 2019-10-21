@@ -6,11 +6,21 @@
 #     print(';;;')
 
 
-def f(n):
-    if n == 3:
-        return True, "B"
-    else:
-        return False, None
+pos_x = [11, 12, 13, 14, 15]
+pos_y = [[14, 15], [13, 14, 15], [12, 13, 14, 15], [11, 12, 13, 14, 15], [11, 12, 13, 14, 15]]
+    
+black_home = set()
+for i in range(5):
+    x = pos_x[i]
+    y_arr = pos_y[i]
 
-if f(3)[0]:
-    print("fff")
+    for y in y_arr:
+        print(x, y)
+        black_home.add((x, y))
+        # if board[x][y] != "W":
+        #     result_white = False
+
+print(black_home)
+
+if (15,11) in black_home:
+    print('che')
