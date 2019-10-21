@@ -4,7 +4,7 @@ import time
 
 import board_rating
 
-with open('input.txt', 'r') as f:
+with open('input4.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:

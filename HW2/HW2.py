@@ -4,7 +4,7 @@ import random
 
 import board_rating
 
-with open('input6.txt', 'r') as f:
+with open('input4.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -18,6 +18,10 @@ board = [ list(i) for i in arr[4:] ]
 # board = [['.', '.', '.', '.', '.', 'W', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'W'], ['.', '.', '.', 'W', '.', '.', '.', '.', '.', 'W', '.', '.', '.', '.', '.', '.'], ['.', 'B', 'W', '.', 'B', '.', '.', '.', '.', '.', '.', 'B', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'], ['.', 'B', '.', '.', '.', 'B', '.', '.', '.', '.', '.', '.', '.', '.', 'B', '.'], ['.', '.', '.', 'W', '.', '.', '.', '.', '.', '.', 'W', '.', '.', '.', 'W', '.'], ['.', '.', '.', '.', 'B', 'W', 'B', '.', '.', 'B', '.', '.', '.', '.', 'W', '.'], ['.', '.', '.', 'B', '.', '.', '.', '.', 'W', '.', '.', '.', '.', '.', '.', 'B'], ['.', '.', '.', '.', '.', '.', '.', 'B', '.', '.', '.', '.', '.', '.', '.', '.'], ['B', '.', '.', 'W', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', 'B', '.', '.', '.', '.', '.', '.', '.', 'W'], ['.', '.', '.', '.', '.', '.', '.', 'W', '.', '.', '.', 'W', '.', '.', '.', 'W'], ['.', '.', 'W', '.', '.', '.', '.', '.', '.', '.', '.', 'B', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', 'W', '.', '.', '.', 'B', '.', 'B', '.'], ['.', '.', '.', '.', '.', '.', 'W', '.', '.', '.', '.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', 'B', '.', 'B', '.', '.', '.', '.', '.']]
 BOARD_SIZE_X = 16
 BOARD_SIZE_Y = 16
+
+black_home = {(0, 1), (1, 2), (3, 2), (0, 0), (1, 3), (3, 0), (1, 0), (2, 2), (3, 1), (1, 4), (2, 1), (2, 0), (1, 1), (2, 3), (0, 4), (0, 3), (4, 1), (0, 2), (4, 0)}
+white_home = {(14, 11), (15, 12), (12, 15), (13, 12), (15, 13), (12, 14), (13, 13), (12, 13), (13, 14), (13, 15), (14, 13), (14, 12), (15, 11), (14, 15), (11, 14), (14, 14), (11, 15), (15, 14), (15, 15)}
+    
 
 # print(arr)
 
@@ -193,19 +197,19 @@ def total_moves_available(board, player):
 
             for inner_moves in moves:
                 s = f"{str(ro)},{str(col)}-{str(inner_moves[0])},{str(inner_moves[1])}"
-                if is_valid_move(s, player):
+                if is_valid_move(s, player, board):
                     list_of_moves.append(s)
             
             # 8 single moves
             single_moves = one_move(board, ro, col)
             for i in single_moves:
-                if is_valid_move(i, player):
+                if is_valid_move(i, player, board):
                     list_of_moves.append(i)
     
     # print(total_moves, moves_dict)
     
     
-    
+    # list_of_moves = move_filteration_new_rules(board, list_of_moves, player)
     return list_of_moves
     # return total_moves
 
@@ -279,9 +283,7 @@ def terminal_test(board):
 # print(terminal_test(board))
 
 
-def is_valid_move(m_move, player):
-    black_home = {(0, 1), (1, 2), (3, 2), (0, 0), (1, 3), (3, 0), (1, 0), (2, 2), (3, 1), (1, 4), (2, 1), (2, 0), (1, 1), (2, 3), (0, 4), (0, 3), (4, 1), (0, 2), (4, 0)}
-    white_home = {(14, 11), (15, 12), (12, 15), (13, 12), (15, 13), (12, 14), (13, 13), (12, 13), (13, 14), (13, 15), (14, 13), (14, 12), (15, 11), (14, 15), (11, 14), (14, 14), (11, 15), (15, 14), (15, 15)}
+def is_valid_move(m_move, player, board):
     
     from_x, from_y = list(map(int, m_move.split('-')[0].split(',')))
     to_x, to_y = list(map(int, m_move.split('-')[1].split(',')))
@@ -299,9 +301,72 @@ def is_valid_move(m_move, player):
         return True
 
 def is_valid_move_tester():
-    print(is_valid_move("14,12-14,11", "W"))
+    print("-------- is_valid_move_tester()")
+    print(is_valid_move("14,12-15,11", "W", board))
+    print("-----------------------------------------")
 
-# is_valid_move_tester()
+is_valid_move_tester()
+
+
+def is_inside_out_move(board, m_move, player):
+    from_x, from_y = list(map(int, m_move.split('-')[0].split(',')))
+    to_x, to_y = list(map(int, m_move.split('-')[1].split(',')))
+    home = None
+    if player == "B":
+        home = black_home
+    elif player == "W":
+        home = white_home
+    
+    if ((from_x, from_y) in home) and ((to_x, to_y) not in home):
+        return True
+    else:
+        return False
+
+
+def is_strictly_outside_move(board, m_move, player):
+    from_x, from_y = list(map(int, m_move.split('-')[0].split(',')))
+    to_x, to_y = list(map(int, m_move.split('-')[1].split(',')))
+    home = None
+    if player == "B":
+        home = black_home
+    elif player == "W":
+        home = white_home
+    
+    if ((from_x, from_y) not in home) and ((to_x, to_y) not in home):
+        return True
+    else:
+        return False
+
+
+def is_inside_in_move(board, m_move, player):
+    from_x, from_y = list(map(int, m_move.split('-')[0].split(',')))
+    to_x, to_y = list(map(int, m_move.split('-')[1].split(',')))
+    home = None
+    if player == "B":
+        home = black_home
+    elif player == "W":
+        home = white_home
+    
+    if ((from_x, from_y) in home) and ((to_x, to_y) in home):
+        return True
+    else:
+        return False
+
+def is_inside_out_tester():
+    print("-------- is_inside_out_tester() ")
+    m_move = "2,2-3,3"
+    plyr = "B"
+    print(is_inside_out_move(board, m_move, plyr))
+    print(is_strictly_outside_move(board, m_move, plyr))
+    print(is_inside_in_move(board, m_move, plyr))
+    print("-----------------------------------------------")
+
+# is_inside_out_tester()
+
+
+def move_filteration_new_rules(board, list_of_moves, player):
+    pass
+
 
 def evaluate_board(board, player):
     is_game_end, winning_player = terminal_test(board)
@@ -406,7 +471,7 @@ def output_writer(move):
 # print(v, move)
 
 
-mm = MinMax(2, get_letter(color), board)
+# mm = MinMax(2, get_letter(color), board)
 
 # start_time = time.time()
 # v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
@@ -417,7 +482,7 @@ mm = MinMax(2, get_letter(color), board)
 # output_writer(move)
 
 def play_game(board):
-    c_p = "W"
+    c_p = get_letter(color)
     b_moves = 0
     w_moves = 0
     # is_mx = True
@@ -425,7 +490,7 @@ def play_game(board):
         b_moves=b_moves+ 1 if c_p == "B" else b_moves
         w_moves= w_moves+ 1 if c_p == "W" else w_moves
         
-        mm = MinMax(1, c_p, board)
+        mm = MinMax(2, c_p, board)
 
         start_time = time.time()
         v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
@@ -446,8 +511,8 @@ def play_game(board):
         print_board(board)
         print(b_moves, w_moves)
         # time.sleep(0.3)
-        # input()
+        input()
 
 strt_tm = time.time()
-play_game(board)
+# play_game(board)
 print("Total ---- Time taken: ", time.time() - strt_tm)
