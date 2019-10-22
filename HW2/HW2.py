@@ -1,10 +1,11 @@
 import copy
 import time
-import random
+# import random
+from functools import partial
 
 import board_rating
 
-with open('input4.txt', 'r') as f:
+with open('input_akash.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -192,29 +193,33 @@ def total_moves_available(board, player):
             moves = []
             visited = {}
             make_jumps(board, ro, col, moves, visited)
+            # print("mmm", moves)
             
             # moves_dict[(ro, col)] = moves
 
             for inner_moves in moves:
                 s = f"{str(ro)},{str(col)}-{str(inner_moves[0])},{str(inner_moves[1])}"
-                if is_valid_move(s, player, board):
+                if is_valid_move(player, board, s):
                     list_of_moves.append(s)
             
             # 8 single moves
             single_moves = one_move(board, ro, col)
+            # print(single_moves)
+
             for i in single_moves:
-                if is_valid_move(i, player, board):
+                if is_valid_move(player, board, i):
                     list_of_moves.append(i)
-    
+            # print(list_of_moves)
+            
+        # print(list_of_moves)
     # print(total_moves, moves_dict)
     
     
-    # list_of_moves = move_filteration_new_rules(board, list_of_moves, player)
+    list_of_moves = move_filteration_new_rules(board, list_of_moves, player)
     return list_of_moves
     # return total_moves
 
-# player = "B"
-# print((total_moves_available(board, player)))
+
 
 
 def update_board(action, board):
@@ -283,7 +288,7 @@ def terminal_test(board):
 # print(terminal_test(board))
 
 
-def is_valid_move(m_move, player, board):
+def is_valid_move(player, board, m_move):
     
     from_x, from_y = list(map(int, m_move.split('-')[0].split(',')))
     to_x, to_y = list(map(int, m_move.split('-')[1].split(',')))
@@ -302,13 +307,13 @@ def is_valid_move(m_move, player, board):
 
 def is_valid_move_tester():
     print("-------- is_valid_move_tester()")
-    print(is_valid_move("14,12-15,11", "W", board))
+    print(is_valid_move("W", board, "14,12-15,11"))
     print("-----------------------------------------")
 
-is_valid_move_tester()
+# is_valid_move_tester()
 
 
-def is_inside_out_move(board, m_move, player):
+def is_inside_out_move(board, player, m_move):
     from_x, from_y = list(map(int, m_move.split('-')[0].split(',')))
     to_x, to_y = list(map(int, m_move.split('-')[1].split(',')))
     home = None
@@ -323,7 +328,7 @@ def is_inside_out_move(board, m_move, player):
         return False
 
 
-def is_strictly_outside_move(board, m_move, player):
+def is_strictly_outside_move(board, player, m_move):
     from_x, from_y = list(map(int, m_move.split('-')[0].split(',')))
     to_x, to_y = list(map(int, m_move.split('-')[1].split(',')))
     home = None
@@ -338,7 +343,7 @@ def is_strictly_outside_move(board, m_move, player):
         return False
 
 
-def is_inside_in_move(board, m_move, player):
+def is_inside_in_move(board, player, m_move):
     from_x, from_y = list(map(int, m_move.split('-')[0].split(',')))
     to_x, to_y = list(map(int, m_move.split('-')[1].split(',')))
     home = None
@@ -352,21 +357,88 @@ def is_inside_in_move(board, m_move, player):
     else:
         return False
 
+
+def is_not_outside_in_move(board, player, m_move):
+    from_x, from_y = list(map(int, m_move.split('-')[0].split(',')))
+    to_x, to_y = list(map(int, m_move.split('-')[1].split(',')))
+    home = None
+    if player == "B":
+        home = black_home
+    elif player == "W":
+        home = white_home
+    
+    if ((from_x, from_y) not in home) and ((to_x, to_y) in home):
+        return False
+    else:
+        return True
+
+
+def is_in_camp(board, player, m_move):
+    from_x, from_y = list(map(int, m_move.split('-')[0].split(',')))
+    # to_x, to_y = list(map(int, m_move.split('-')[1].split(',')))
+    home = None
+    if player == "B":
+        home = black_home
+    elif player == "W":
+        home = white_home
+    return ((from_x, from_y) in home)
+
+
 def is_inside_out_tester():
     print("-------- is_inside_out_tester() ")
-    m_move = "2,2-3,3"
+    m_move = "0,4-0,6"
     plyr = "B"
-    print(is_inside_out_move(board, m_move, plyr))
-    print(is_strictly_outside_move(board, m_move, plyr))
-    print(is_inside_in_move(board, m_move, plyr))
+    print("is_inside_out_move: ",is_inside_out_move(board, plyr, m_move))
+    print("is_strictly_outside_move: ",is_strictly_outside_move(board, plyr, m_move))
+    print("is_inside_in_move: ",is_inside_in_move(board, plyr, m_move))
+    print("is_not_outside_in_move: ",is_not_outside_in_move(board, plyr, m_move))
+    print("is_in_camp: ",is_in_camp(board, plyr, m_move))
     print("-----------------------------------------------")
 
 # is_inside_out_tester()
 
-
 def move_filteration_new_rules(board, list_of_moves, player):
-    pass
+    list_of_moves = list(filter(partial(is_not_outside_in_move, board, player), list_of_moves ) )
+    # new_moves = list_of_moves
+    at_least_one_inside = any([is_in_camp(board, player, m_m) for m_m in list_of_moves])
+    if at_least_one_inside:
+        new_moves = list(filter(partial(is_in_camp, board, player), list_of_moves ) )
 
+        at_least_one_inside_out = any([is_inside_out_move(board, player, m_m) for m_m in new_moves])
+
+        if at_least_one_inside_out:
+            new_moves = list(filter(partial(is_inside_out_move, board, player), new_moves ) )
+        return new_moves
+    else:
+        return list_of_moves
+    # new_list_move = list(filter)
+    # if atleast_one_inside_out:
+    # print(list_of_moves)
+    
+    # print(new_moves)
+    # return new_moves
+
+
+def move_filteration_new_rules_tester():
+    print("-------- is_inside_out_tester() ")
+    player = "B"
+    l_moves = ["2,3-3,3"]
+    print(move_filteration_new_rules(board, l_moves, player))
+    print("-----------------------------------------------")
+
+
+# move_filteration_new_rules_tester()
+
+
+def total_moves_checker():
+    player = "B"
+    print((total_moves_available(board, player)))
+    # lm = ['0,5-0,4', '0,5-0,6', '0,5-1,4', '0,5-1,6', '1,5-3,3', '1,5-0,4', '1,5-0,6', '1,5-1,4', '1,5-1,6', '1,5-2,6', '2,4-0,6', '2,4-0,4', '2,4-2,6', '2,4-4,6', '2,4-2,8', '2,4-6,4', '2,4-4,8', '2,4-1,3', '2,4-1,4', '2,4-2,3', '2,4-3,3', '2,5-2,3', '2,5-4,7', '2,5-2,7', '2,5-1,4', '2,5-1,6', '2,5-2,6', '3,4-1,4', '3,4-1,6', '3,4-5,4', '3,4-3,2', '3,4-5,6', '3,4-2,3', '3,4-3,3', '3,5-1,3', '3,5-3,3', '3,5-2,6', '3,5-4,6', '3,6-1,4', '3,6-1,6', '3,6-3,8', '3,6-5,4', '3,6-3,2', '3,6-5,6', '3,6-2,6', '3,6-2,7', '3,6-4,6', '3,6-4,7', '3,7-2,6', '3,7-2,7', '3,7-2,8', '3,7-3,8', '3,7-4,6', '3,7-4,7', '3,7-4,8', '4,2-6,4', '4,2-4,6', '4,2-2,6', '4,2-0,4', '4,2-0,6', '4,2-4,8', '4,2-2,8', '4,2-3,1', '4,2-3,2', '4,2-3,3', '4,2-4,1', '4,3-4,1', '4,3-6,1', '4,3-6,3', '4,3-3,2', '4,3-3,3', '4,3-5,4', '4,4-2,6', '4,4-0,4', '4,4-0,6', '4,4-4,6', '4,4-2,8', '4,4-6,4', '4,4-4,8', '4,4-6,6', '4,4-3,3', '4,4-5,4', '4,5-2,3', '4,5-2,7', '4,5-4,7', '4,5-6,5', '4,5-4,6', '4,5-5,4', '4,5-5,6', '5,0-7,0', '5,0-4,0', '5,0-4,1', '5,0-6,1', '5,1-3,3', '5,1-7,3', '5,1-4,0', '5,1-4,1', '5,1-6,1', '5,2-3,2', '5,2-5,4', '5,2-5,6', '5,2-7,2', '5,2-4,1', '5,2-6,1', '5,2-6,3', '5,3-3,1', '5,3-3,3', '5,3-7,1', '5,3-5,4', '5,3-6,3', '5,3-6,4', '5,5-3,3', '5,5-4,6', '5,5-5,4', '5,5-5,6', '5,5-6,4', '5,5-6,5', '5,5-6,6', '6,0-4,0', '6,0-6,1', '6,0-7,0', '6,0-7,1', '6,2-4,0', '6,2-6,1', '6,2-6,3', '6,2-7,1', '6,2-7,2', '6,2-7,3']
+    # lm = list(filter(partial(is_not_outside_in_move, board, player), lm ) )
+    # print(list(filter(partial(is_valid_move, player, board), lm ) ))
+    # print("lzz",lm)
+
+# total_moves_checker()
 
 def evaluate_board(board, player):
     is_game_end, winning_player = terminal_test(board)
@@ -511,8 +583,8 @@ def play_game(board):
         print_board(board)
         print(b_moves, w_moves)
         # time.sleep(0.3)
-        input()
+        # input()
 
 strt_tm = time.time()
-# play_game(board)
+play_game(board)
 print("Total ---- Time taken: ", time.time() - strt_tm)
