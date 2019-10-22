@@ -543,13 +543,13 @@ def output_writer(move):
 # print(v, move)
 
 
-# mm = MinMax(2, get_letter(color), board)
+mm = MinMax(2, get_letter(color), board)
 
-# start_time = time.time()
-# v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
-# print("Nodes searched:", mm.nodes_searched_ab)
-# print("Time taken: ", time.time() - start_time)
-# print("Score: ",v, "| Move: ", move)
+start_time = time.time()
+v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
+print("Nodes searched:", mm.nodes_searched_ab)
+print("Time taken: ", time.time() - start_time)
+print("Score: ",v, "| Move: ", move)
 
 # output_writer(move)
 
@@ -586,5 +586,5 @@ def play_game(board):
         # input()
 
 strt_tm = time.time()
-play_game(board)
+# play_game(board)
 print("Total ---- Time taken: ", time.time() - strt_tm)
