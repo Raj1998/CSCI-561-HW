@@ -5,7 +5,7 @@ from functools import partial
 
 import board_rating
 
-with open('input0.txt', 'r') as f:
+with open('input7.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -252,36 +252,37 @@ def terminal_test(board):
         else Boolean, None
     """
     # win condition for Black player
-    pos_x = [11, 12, 13, 14, 15]
-    pos_y = [[14, 15], [13, 14, 15], [12, 13, 14, 15], [11, 12, 13, 14, 15], [11, 12, 13, 14, 15]]
+    # pos_x = [11, 12, 13, 14, 15]
+    # pos_y = [[14, 15], [13, 14, 15], [12, 13, 14, 15], [11, 12, 13, 14, 15], [11, 12, 13, 14, 15]]
     result_black = True
 
-    for i in range(5):
-        x = pos_x[i]
-        y_arr = pos_y[i]
+    # for i in range(5):
+    #     x = pos_x[i]
+    #     y_arr = pos_y[i]
 
-        for y in y_arr:
-            # print(x, y)
-            if board[x][y] != "B":
-                result_black = False
+    for (x,y) in white_home:
+        # print(x, y)
+        if board[x][y] != "B" and board[x][y] == ".":
+            result_black = False
+                
     
     if result_black == True:
         # print("B wins")
         return True, "B"
     
     # win condition for white player
-    pos_x = [0, 1, 2, 3, 4]
-    pos_y = [[0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3], [0, 1, 2], [0, 1]]
+    # pos_x = [0, 1, 2, 3, 4]
+    # pos_y = [[0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3], [0, 1, 2], [0, 1]]
     result_white = True
 
-    for i in range(5):
-        x = pos_x[i]
-        y_arr = pos_y[i]
+    # for i in range(5):
+    #     x = pos_x[i]
+    #     y_arr = pos_y[i]
 
-        for y in y_arr:
-            # print(x, y)
-            if board[x][y] != "W":
-                result_white = False
+    for (x,y) in black_home:
+        # print(x, y)
+        if board[x][y] != "W":
+            result_white = False
     
     if result_white == True:
         # print("W wins")
@@ -289,7 +290,7 @@ def terminal_test(board):
 
     return False, None
 
-# print(terminal_test(board))
+print(terminal_test(board))
 
 
 def is_valid_move(player, board, m_move):
@@ -455,9 +456,9 @@ def evaluate_board(board, player):
     is_game_end, winning_player = terminal_test(board)
     if is_game_end:
         if winning_player == player:
-            return 50000
+            return 500000
         elif winning_player == other_player(player):
-            return -50000
+            return -500000
     
     score = 0
     score += board_rating.rating(board, player)
@@ -559,15 +560,15 @@ if game == "sinsgle":
 
 # else:
 # print("game mode")
-mm = MinMax(2, get_letter(color), board)
+# mm = MinMax(2, get_letter(color), board)
 
-start_time = time.time()
-v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
-print("Nodes searched:", mm.nodes_searched_ab)
-print("Time taken: ", time.time() - start_time)
-print("Score: ",v, "| Move: ", move)
+# start_time = time.time()
+# v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
+# print("Nodes searched:", mm.nodes_searched_ab)
+# print("Time taken: ", time.time() - start_time)
+# print("Score: ",v, "| Move: ", move)
 
-output_writer(move)
+# output_writer(move)
 
 def play_game(board):
     strt_tm = time.time()
@@ -597,8 +598,7 @@ def play_game(board):
         
         board = update_board(move, board)
 
-        # is_mx = not is_mx
-        c_p = other_player(c_p)
+        # c_p = other_player(c_p)
 
         print_board(board)
         print(b_moves, w_moves)
@@ -606,4 +606,4 @@ def play_game(board):
         # input()
     print("Game time ---- Time taken: ", time.time() - strt_tm)
 
-# play_game(board)
+play_game(board)
