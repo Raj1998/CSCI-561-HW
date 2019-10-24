@@ -1,11 +1,11 @@
 import copy
 import time
-# import random
+import random
 from functools import partial
 
 import board_rating
 
-with open('input_akash.txt', 'r') as f:
+with open('input0.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -77,6 +77,8 @@ class MinMax:
         return v, selected_move
 
     def min_max_ab(self, curr_depth, is_max_player, board, alpha, beta):
+        # print(alpha, beta)
+        # input()
         self.nodes_searched_ab += 1
         is_game_end, _ = terminal_test(board)
         if (curr_depth == self.max_depth) or (is_game_end):
@@ -100,6 +102,7 @@ class MinMax:
                 selected_move = action
                 alpha = max(alpha, v)
                 if alpha >= beta:
+                    # print("prunned  - alpha")
                     break
 
             elif (not is_max_player) and expanded_v < v:
@@ -107,6 +110,7 @@ class MinMax:
                 selected_move = action
                 beta = min(beta, v)
                 if alpha >= beta:
+                    # print("prunned  - alpha")
                     break
 
         return v, selected_move
@@ -408,6 +412,12 @@ def move_filteration_new_rules(board, list_of_moves, player):
 
         if at_least_one_inside_out:
             new_moves = list(filter(partial(is_inside_out_move, board, player), new_moves ) )
+        
+        # -----
+        # else is not needed because it is being checken in total_move() function.
+        # else:
+        #     new_moves = list(filter(partial(is_valid_move, player, board), new_moves ))
+        # -----
         return new_moves
     else:
         return list_of_moves
@@ -422,7 +432,8 @@ def move_filteration_new_rules(board, list_of_moves, player):
 def move_filteration_new_rules_tester():
     print("-------- is_inside_out_tester() ")
     player = "B"
-    l_moves = ["2,3-3,3"]
+    # "2,2-1,1" is not valid by is being checked in total_moves_available() code
+    l_moves = ["12,3-13,3", "2,2-1,1", "1,1-3,1"]
     print(move_filteration_new_rules(board, l_moves, player))
     print("-----------------------------------------------")
 
@@ -542,7 +553,12 @@ def output_writer(move):
 # print("Time taken: ", time.time() - start_time)
 # print(v, move)
 
+if game == "sinsgle":
+    avl_moves = total_moves_available(board, get_letter(color))
+    print(avl_moves[0])
 
+# else:
+# print("game mode")
 mm = MinMax(2, get_letter(color), board)
 
 start_time = time.time()
@@ -551,9 +567,10 @@ print("Nodes searched:", mm.nodes_searched_ab)
 print("Time taken: ", time.time() - start_time)
 print("Score: ",v, "| Move: ", move)
 
-# output_writer(move)
+output_writer(move)
 
 def play_game(board):
+    strt_tm = time.time()
     c_p = get_letter(color)
     b_moves = 0
     w_moves = 0
@@ -562,12 +579,15 @@ def play_game(board):
         b_moves=b_moves+ 1 if c_p == "B" else b_moves
         w_moves= w_moves+ 1 if c_p == "W" else w_moves
         
-        mm = MinMax(2, c_p, board)
+        mm = MinMax(3, c_p, board)
 
         start_time = time.time()
         v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
+        print("Nodes searched: ",mm.nodes_searched_ab)
+        
         # v, move = mm.min_max(0, True, board)
-        print(mm.nodes_searched_ab)
+        # print("Nodes searched: ", mm.nodes_searched)
+
         print("Time taken: ", time.time() - start_time)
         print("Score: ",v, "| Move: ", move, " - ", c_p)
         
@@ -584,7 +604,6 @@ def play_game(board):
         print(b_moves, w_moves)
         # time.sleep(0.3)
         # input()
+    print("Game time ---- Time taken: ", time.time() - strt_tm)
 
-strt_tm = time.time()
 # play_game(board)
-print("Total ---- Time taken: ", time.time() - strt_tm)
