@@ -5,7 +5,7 @@ from functools import partial
 
 import board_rating
 
-with open('input6.txt', 'r') as f:
+with open('input0.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -632,4 +632,4 @@ def play_game(board):
         # input()
     print("Game time ---- Time taken: ", time.time() - strt_tm)
 
-# play_game(board)
+play_game(board)
