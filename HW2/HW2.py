@@ -472,7 +472,7 @@ def total_moves_checker():
     # print(list(filter(partial(is_valid_move, player, board), lm ) ))
     # print("lzz",lm)
 
-total_moves_checker()
+# total_moves_checker()
 
 def evaluate_board(board, player):
     is_game_end, winning_player = terminal_test(board)
