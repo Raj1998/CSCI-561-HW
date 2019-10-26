@@ -5,7 +5,7 @@ from functools import partial
 
 import board_rating
 
-with open('input.txt', 'r') as f:
+with open('input7.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
