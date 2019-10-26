@@ -15,8 +15,8 @@ while count < 19:
     if board[x][y] == ".":
         board[x][y] = "B"
         count+=1
-for b in board:
-    print(b)
+# for b in board:
+#     print(b)
 
 print(board)
 

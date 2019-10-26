@@ -1,11 +1,11 @@
 import copy
-import time
+# import time
 # import random
 from functools import partial
 
 import board_rating
 
-with open('input4.txt', 'r') as f:
+with open('input.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -16,7 +16,7 @@ game = arr[1].lower()
 color = arr[2].lower()
 rem_time = float(arr[3])
 board = [ list(i) for i in arr[4:] ]
-# board = [['.', '.', '.', '.', '.', 'W', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'W'], ['.', '.', '.', 'W', '.', '.', '.', '.', '.', 'W', '.', '.', '.', '.', '.', '.'], ['.', 'B', 'W', '.', 'B', '.', '.', '.', '.', '.', '.', 'B', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'], ['.', 'B', '.', '.', '.', 'B', '.', '.', '.', '.', '.', '.', '.', '.', 'B', '.'], ['.', '.', '.', 'W', '.', '.', '.', '.', '.', '.', 'W', '.', '.', '.', 'W', '.'], ['.', '.', '.', '.', 'B', 'W', 'B', '.', '.', 'B', '.', '.', '.', '.', 'W', '.'], ['.', '.', '.', 'B', '.', '.', '.', '.', 'W', '.', '.', '.', '.', '.', '.', 'B'], ['.', '.', '.', '.', '.', '.', '.', 'B', '.', '.', '.', '.', '.', '.', '.', '.'], ['B', '.', '.', 'W', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', 'B', '.', '.', '.', '.', '.', '.', '.', 'W'], ['.', '.', '.', '.', '.', '.', '.', 'W', '.', '.', '.', 'W', '.', '.', '.', 'W'], ['.', '.', 'W', '.', '.', '.', '.', '.', '.', '.', '.', 'B', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', 'W', '.', '.', '.', 'B', '.', 'B', '.'], ['.', '.', '.', '.', '.', '.', 'W', '.', '.', '.', '.', '.', '.', '.', '.', '.'], ['.', '.', '.', '.', '.', '.', '.', '.', 'B', '.', 'B', '.', '.', '.', '.', '.']]
+
 BOARD_SIZE_X = 16
 BOARD_SIZE_Y = 16
 
@@ -77,6 +77,8 @@ class MinMax:
         return v, selected_move
 
     def min_max_ab(self, curr_depth, is_max_player, board, alpha, beta):
+        # print(alpha, beta)
+        # input()
         self.nodes_searched_ab += 1
         is_game_end, _ = terminal_test(board)
         if (curr_depth == self.max_depth) or (is_game_end):
@@ -100,6 +102,7 @@ class MinMax:
                 selected_move = action
                 alpha = max(alpha, v)
                 if alpha >= beta:
+                    # print("prunned  - alpha")
                     break
 
             elif (not is_max_player) and expanded_v < v:
@@ -107,6 +110,7 @@ class MinMax:
                 selected_move = action
                 beta = min(beta, v)
                 if alpha >= beta:
+                    # print("prunned  - alpha")
                     break
 
         return v, selected_move
@@ -133,6 +137,7 @@ def print_board(board):
     print()
 
 # print_board(board)
+# print('---------------------')
 
 def one_move(board, from_x, from_y):
     # assert (board[from_x][from_y] == "."), "No Piece on this spot"
@@ -248,36 +253,37 @@ def terminal_test(board):
         else Boolean, None
     """
     # win condition for Black player
-    pos_x = [11, 12, 13, 14, 15]
-    pos_y = [[14, 15], [13, 14, 15], [12, 13, 14, 15], [11, 12, 13, 14, 15], [11, 12, 13, 14, 15]]
+    # pos_x = [11, 12, 13, 14, 15]
+    # pos_y = [[14, 15], [13, 14, 15], [12, 13, 14, 15], [11, 12, 13, 14, 15], [11, 12, 13, 14, 15]]
     result_black = True
 
-    for i in range(5):
-        x = pos_x[i]
-        y_arr = pos_y[i]
+    # for i in range(5):
+    #     x = pos_x[i]
+    #     y_arr = pos_y[i]
 
-        for y in y_arr:
-            # print(x, y)
-            if board[x][y] != "B":
-                result_black = False
+    for (x,y) in white_home:
+        # print(x, y)
+        if board[x][y] != "B":
+            result_black = False
+                
     
     if result_black == True:
         # print("B wins")
         return True, "B"
     
     # win condition for white player
-    pos_x = [0, 1, 2, 3, 4]
-    pos_y = [[0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3], [0, 1, 2], [0, 1]]
+    # pos_x = [0, 1, 2, 3, 4]
+    # pos_y = [[0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3], [0, 1, 2], [0, 1]]
     result_white = True
 
-    for i in range(5):
-        x = pos_x[i]
-        y_arr = pos_y[i]
+    # for i in range(5):
+    #     x = pos_x[i]
+    #     y_arr = pos_y[i]
 
-        for y in y_arr:
-            # print(x, y)
-            if board[x][y] != "W":
-                result_white = False
+    for (x,y) in black_home:
+        # print(x, y)
+        if board[x][y] != "W":
+            result_white = False
     
     if result_white == True:
         # print("W wins")
@@ -384,21 +390,42 @@ def is_in_camp(board, player, m_move):
     return ((from_x, from_y) in home)
 
 
+def is_not_opp_inside_out_move(board, player, m_move):
+    '''
+    opponent camp inside out move is invalid
+    '''
+    from_x, from_y = list(map(int, m_move.split('-')[0].split(',')))
+    to_x, to_y = list(map(int, m_move.split('-')[1].split(',')))
+    home = None
+    if player == "B":
+        home = white_home
+    elif player == "W":
+        home = black_home
+    
+    if ((from_x, from_y) in home) and ((to_x, to_y) not in home):
+        return False
+    else:
+        return True
+    
+
 def is_inside_out_tester():
     print("-------- is_inside_out_tester() ")
-    m_move = "0,4-0,6"
+    m_move = "0,0-13,13"
     plyr = "B"
     print("is_inside_out_move: ",is_inside_out_move(board, plyr, m_move))
     print("is_strictly_outside_move: ",is_strictly_outside_move(board, plyr, m_move))
     print("is_inside_in_move: ",is_inside_in_move(board, plyr, m_move))
     print("is_not_outside_in_move: ",is_not_outside_in_move(board, plyr, m_move))
     print("is_in_camp: ",is_in_camp(board, plyr, m_move))
+    print("is_not_opp_inside_out_move: ",is_not_opp_inside_out_move(board, plyr, m_move))
     print("-----------------------------------------------")
 
 # is_inside_out_tester()
 
 def move_filteration_new_rules(board, list_of_moves, player):
     list_of_moves = list(filter(partial(is_not_outside_in_move, board, player), list_of_moves ) )
+    list_of_moves = list(filter(partial(is_not_opp_inside_out_move, board, player), list_of_moves ) )
+
     # new_moves = list_of_moves
     at_least_one_inside = any([is_in_camp(board, player, m_m) for m_m in list_of_moves])
     if at_least_one_inside:
@@ -408,6 +435,12 @@ def move_filteration_new_rules(board, list_of_moves, player):
 
         if at_least_one_inside_out:
             new_moves = list(filter(partial(is_inside_out_move, board, player), new_moves ) )
+        
+        # -----
+        # else is not needed because it is being checken in total_move() function.
+        # else:
+        #     new_moves = list(filter(partial(is_valid_move, player, board), new_moves ))
+        # -----
         return new_moves
     else:
         return list_of_moves
@@ -420,9 +453,10 @@ def move_filteration_new_rules(board, list_of_moves, player):
 
 
 def move_filteration_new_rules_tester():
-    print("-------- is_inside_out_tester() ")
+    print("-------- move_filteration_new_rules_tester() ")
     player = "B"
-    l_moves = ["2,3-3,3"]
+    # "2,2-1,1" is not valid by is being checked in total_moves_available() code
+    l_moves = ["12,13-13,3", "12,10-15,15", "11,9-8,7"]
     print(move_filteration_new_rules(board, l_moves, player))
     print("-----------------------------------------------")
 
@@ -432,7 +466,7 @@ def move_filteration_new_rules_tester():
 
 def total_moves_checker():
     player = "B"
-    print((total_moves_available(board, player)))
+    print(len(total_moves_available(board, player)))
     # lm = ['0,5-0,4', '0,5-0,6', '0,5-1,4', '0,5-1,6', '1,5-3,3', '1,5-0,4', '1,5-0,6', '1,5-1,4', '1,5-1,6', '1,5-2,6', '2,4-0,6', '2,4-0,4', '2,4-2,6', '2,4-4,6', '2,4-2,8', '2,4-6,4', '2,4-4,8', '2,4-1,3', '2,4-1,4', '2,4-2,3', '2,4-3,3', '2,5-2,3', '2,5-4,7', '2,5-2,7', '2,5-1,4', '2,5-1,6', '2,5-2,6', '3,4-1,4', '3,4-1,6', '3,4-5,4', '3,4-3,2', '3,4-5,6', '3,4-2,3', '3,4-3,3', '3,5-1,3', '3,5-3,3', '3,5-2,6', '3,5-4,6', '3,6-1,4', '3,6-1,6', '3,6-3,8', '3,6-5,4', '3,6-3,2', '3,6-5,6', '3,6-2,6', '3,6-2,7', '3,6-4,6', '3,6-4,7', '3,7-2,6', '3,7-2,7', '3,7-2,8', '3,7-3,8', '3,7-4,6', '3,7-4,7', '3,7-4,8', '4,2-6,4', '4,2-4,6', '4,2-2,6', '4,2-0,4', '4,2-0,6', '4,2-4,8', '4,2-2,8', '4,2-3,1', '4,2-3,2', '4,2-3,3', '4,2-4,1', '4,3-4,1', '4,3-6,1', '4,3-6,3', '4,3-3,2', '4,3-3,3', '4,3-5,4', '4,4-2,6', '4,4-0,4', '4,4-0,6', '4,4-4,6', '4,4-2,8', '4,4-6,4', '4,4-4,8', '4,4-6,6', '4,4-3,3', '4,4-5,4', '4,5-2,3', '4,5-2,7', '4,5-4,7', '4,5-6,5', '4,5-4,6', '4,5-5,4', '4,5-5,6', '5,0-7,0', '5,0-4,0', '5,0-4,1', '5,0-6,1', '5,1-3,3', '5,1-7,3', '5,1-4,0', '5,1-4,1', '5,1-6,1', '5,2-3,2', '5,2-5,4', '5,2-5,6', '5,2-7,2', '5,2-4,1', '5,2-6,1', '5,2-6,3', '5,3-3,1', '5,3-3,3', '5,3-7,1', '5,3-5,4', '5,3-6,3', '5,3-6,4', '5,5-3,3', '5,5-4,6', '5,5-5,4', '5,5-5,6', '5,5-6,4', '5,5-6,5', '5,5-6,6', '6,0-4,0', '6,0-6,1', '6,0-7,0', '6,0-7,1', '6,2-4,0', '6,2-6,1', '6,2-6,3', '6,2-7,1', '6,2-7,2', '6,2-7,3']
     # lm = list(filter(partial(is_not_outside_in_move, board, player), lm ) )
     # print(list(filter(partial(is_valid_move, player, board), lm ) ))
@@ -444,9 +478,9 @@ def evaluate_board(board, player):
     is_game_end, winning_player = terminal_test(board)
     if is_game_end:
         if winning_player == player:
-            return 50000
+            return 500000
         elif winning_player == other_player(player):
-            return -50000
+            return -500000
     
     score = 0
     score += board_rating.rating(board, player)
@@ -542,49 +576,25 @@ def output_writer(move):
 # print("Time taken: ", time.time() - start_time)
 # print(v, move)
 
+if game == "single":
+    # print("single mode")
+    mm = MinMax(1, get_letter(color), board)
 
-mm = MinMax(2, get_letter(color), board)
+    v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
+    # print(avl_moves[0])
 
-start_time = time.time()
-v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
-# print("Nodes searched:", mm.nodes_searched_ab)
-# print("Time taken: ", time.time() - start_time)
-# print("Score: ",v, "| Move: ", move)
+    output_writer(move)
 
-output_writer(move)
+else:
+    # print("game mode")
+    mm = MinMax(2, get_letter(color), board)
 
-def play_game(board):
-    c_p = get_letter(color)
-    b_moves = 0
-    w_moves = 0
-    # is_mx = True
-    while True:
-        b_moves=b_moves+ 1 if c_p == "B" else b_moves
-        w_moves= w_moves+ 1 if c_p == "W" else w_moves
-        
-        mm = MinMax(2, c_p, board)
+    # start_time = time.time()
+    v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
+    # print("Nodes searched:", mm.nodes_searched_ab)
+    # print("Time taken: ", time.time() - start_time)
+    # print("Score: ",v, "| Move: ", move)
 
-        start_time = time.time()
-        v, move = mm.min_max_ab(0, True, board, float("-inf"), float("inf"))
-        # v, move = mm.min_max(0, True, board)
-        print(mm.nodes_searched_ab)
-        print("Time taken: ", time.time() - start_time)
-        print("Score: ",v, "| Move: ", move, " - ", c_p)
-        
-        if not move:
-            print('winner is ', other_player(c_p))
-            return
-        
-        board = update_board(move, board)
+    output_writer(move)
 
-        # is_mx = not is_mx
-        c_p = other_player(c_p)
 
-        print_board(board)
-        print(b_moves, w_moves)
-        # time.sleep(0.3)
-        # input()
-
-# strt_tm = time.time()
-# play_game(board)
-# print("Total ---- Time taken: ", time.time() - strt_tm)
