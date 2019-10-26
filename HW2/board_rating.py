@@ -44,6 +44,7 @@ def other_player(color):
 def rating(board, player_color):
     score = 0
     score += rate_positions(board, player_color)
+    # if player_color == "W":
     # score -= rate_positions(board, other_player(player_color))
     return score
 
