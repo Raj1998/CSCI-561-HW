@@ -5,7 +5,7 @@ from functools import partial
 
 # import board_rating
 
-with open('input10.txt', 'r') as f:
+with open('input12.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -636,6 +636,7 @@ def output_writer(move):
 
 # else:
 # print("game mode")
+
 # mm = MinMax(2, get_letter(color), board)
 
 # start_time = time.time()
@@ -649,6 +650,7 @@ def output_writer(move):
 def play_game(board):
     strt_tm = time.time()
     c_p = "W"
+    # c_p = get_letter(color)
     b_moves = 0
     w_moves = 0
     # is_mx = True
@@ -678,7 +680,7 @@ def play_game(board):
         
         board = update_board(move, board)
 
-        c_p = other_player(c_p)
+        # c_p = other_player(c_p)
 
         print_board(board)
         print(b_moves, w_moves)
@@ -686,4 +688,4 @@ def play_game(board):
         input()
     print("Game time ---- Time taken: ", time.time() - strt_tm)
 
-play_game(board)
+# play_game(board)
