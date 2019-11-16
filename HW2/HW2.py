@@ -5,7 +5,7 @@ from functools import partial
 
 # import board_rating
 
-with open('input12.txt', 'r') as f:
+with open('input0.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -581,7 +581,6 @@ def is_E_move_tester():
     print(is_E_move(3,5, 4,6))
 
 # is_E_move_tester()
-
 def output_writer(move):
     with open("output.txt", "w") as m_file:
         from_x, from_y = list(map(int, move.split('-')[0].split(',')))
@@ -618,8 +617,6 @@ def output_writer(move):
                 m_file.write(m_path[i])
                 if i!=0:
                     m_file.write("\n")
-
-
 
 
 # mm = MinMax(3, "B", board)
@@ -680,12 +677,12 @@ def play_game(board):
         
         board = update_board(move, board)
 
-        # c_p = other_player(c_p)
+        c_p = other_player(c_p)
 
         print_board(board)
         print(b_moves, w_moves)
         
-        input()
+        # input()
     print("Game time ---- Time taken: ", time.time() - strt_tm)
 
 # play_game(board)
