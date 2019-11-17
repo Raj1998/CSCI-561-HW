@@ -59,6 +59,7 @@ for i in knowledge_base:
 
 
 KB = defaultdict(lambda: defaultdict(dict))
+Literal = namedtuple("Literal", ["name", "is_false", "args"])
 
 class Sentence:
     def __init__(self, raw_sentence, positive_predicates, negative_predicates, variables, constants, list_of_literals):
@@ -70,6 +71,13 @@ class Sentence:
 
         self.list_of_literals = list_of_literals
 
+        self.predicate_map = defaultdict(lambda: defaultdict(list))
+        for literal in self.list_of_literals:
+            if literal.is_false:
+                self.predicate_map[literal.name]['neg'].append(literal)
+            elif not literal.is_false:
+                self.predicate_map[literal.name]['pos'].append(literal)
+
 
 
     def __str__(self):
@@ -77,7 +85,7 @@ class Sentence:
     
     # def __repr__(self):
     #     return f"{self.raw_sentence}"
-Literal = namedtuple("Literal", ["name", "is_false", "args"])
+
 
 def parse_sentence(m_sentence):
     # sentence must be in CNF, else it wont work
@@ -126,14 +134,14 @@ def parse_sentence(m_sentence):
                 variables.add(arg)
             else:
                 constants.add(arg)
-        # raw_sentence = 
+        
         print(variables)
     return parsed_data
 
 def parse_sentence_tester():
 
     # sent = "~Take(x,Warfarin) | ~Take(x,Timolol) | Alert(x,VitE) | ~Alert(y, VitD)"
-    sent = "~Take(x,Warfarin) | ~Take(x,Timolol) | Alert(x,VitE)"
+    sent = "~Take(x,Warfarin) | ~Take(x,Timolol) | Alert(x,VitE) | ~HighBP(z,Jkon)"
     data = parse_sentence(sent)
     obj_sentence = Sentence(sent, data['positive_predicates'], data['negative_predicates'], data['variables'], data['constants'], data['list_of_literals'])
     for i in data['positive_predicates']:
@@ -143,7 +151,7 @@ def parse_sentence_tester():
     print("Obj sent---")
     print(obj_sentence)
 
-    sent1 = "~Alert(Alice,VitE)"
+    sent1 = "~Alert(Alice,VitE) | HighBP(Tim,John)"
     data = parse_sentence(sent1)
     obj_sentence1 = Sentence(sent1, data['positive_predicates'], data['negative_predicates'], data['variables'], data['constants'], data['list_of_literals'])
     for i in data['positive_predicates']:
@@ -155,28 +163,47 @@ def parse_sentence_tester():
 
     print("---->><<----")
 
-    theta = {}
+    all_resolutions = []
     for item1 in obj_sentence1.list_of_literals:
         for item2 in obj_sentence.list_of_literals:
             if item1.name == item2.name and item1.is_false != item2.is_false:
+                theta = {}
+                temp_i1 = None
                 for i1, i2 in zip(item1.args, item2.args):
                     if (i1[0].isupper() and i2[0].isupper()) and (i1 != i2):
                         theta = {}
                         break
                     elif (i1[0].isupper() and not i2[0].isupper()):
-                        theta = {i2: i1}
+                        theta[i2] = i1
                     elif (not i1[0].isupper() and i2[0].isupper()):
-                        theta = {i1: i2}
+                        theta[i1]  = i2
                     else:
                         #TODO
                         # can variables be unified?
                         pass
+                if theta:
+                    temp_i1 = [x for x in obj_sentence1.list_of_literals if x!=item1]
+                    temp_i2 = [x for x in obj_sentence.list_of_literals if x != item2]
+                    temp_i = temp_i1+temp_i2
+                    print(temp_i)
+
+                    all_resolutions.append(theta)
+
+                    for i, j in theta.items():
+                        for new_i in temp_i:
+                            for idx, arg in enumerate(new_i.args):
+                                if arg == i:
+                                    new_i.args[idx] = j
+                                # new_i.args[j for x in new_i.args if x==i]
+                    print(temp_i)
     
-    print(theta)
+    print(all_resolutions)
     sent_new = sent[:]
     for i, j in theta.items():
-        print(i, j)
+        # print(i, j)
         sent_new = sent_new.replace(i, j)
+        #TODO
+        # cant replace like this
     print(sent_new)
 
 parse_sentence_tester()
