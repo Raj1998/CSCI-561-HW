@@ -1,5 +1,5 @@
 1
-Take(Alice,NSAIDs)
+A(John)
 2
-Take(x,Warfarin) => ~Take(x,NSAIDs)
-Take(Alice,Warfarin)
+A(x) => B(x)
+B(x) => A(x)

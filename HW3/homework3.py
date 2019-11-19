@@ -15,6 +15,7 @@ no_of_kb_clauses = int(arr[2 + no_of_queries])
 queries          = arr[2: 2+no_of_queries]
 knowledge_base   = arr[2+no_of_queries+1:]
 global_variable_counter = count()
+max_recursion_depth_limit = sys.getrecursionlimit()
 
 # print("------")
 # print(arr)
@@ -116,6 +117,7 @@ class Sentence:
     # def __repr__(self):
     #     return f"{self.raw_sentence}"
 
+
 def print_kb(KB):
     for key, val in KB.items():
         print(f"\"{key}\"")
@@ -183,6 +185,22 @@ def parse_sentence(m_sentence):
         # print(variables)
     return parsed_data
 
+
+def resolution_without_theta(literals):
+    # To remove HighBP(Tim, John) and ~HignBP(Tim, John)
+    # HighBP(Tim,John) | ~Take(Alice,Warfarin) | ~HighBP(z,Jkon) | ~HighBP(Tim,John)
+    remove_items_idx = set()
+    for i in range(len(literals)-1):
+        for j in range(i+1, len(literals)):
+            if (literals[i].name == literals[j].name) and (literals[i].is_false != literals[j].is_false):
+                if literals[i].args == literals[j].args:
+                    remove_items_idx.add(i)
+                    remove_items_idx.add(j)
+    
+    literals = [x for idx, x in enumerate(literals) if idx not in remove_items_idx]
+    return literals
+
+
 def generate_sentence_from_list(list_of_literals):
     
     temp_dict = {}
@@ -196,27 +214,27 @@ def generate_sentence_from_list(list_of_literals):
             if is_var(var) and var in temp_dict:
                 literal.args[idx] = temp_dict[var]
 
-    print(temp_dict)
+    # print(temp_dict)
 
     obj_sentence = Sentence(list_of_literals)
-    pos = set()
-    neg = set()
-    for literal in list_of_literals:
-        if literal.is_false:
-            neg.add(literal.name)
-        else:
-            pos.add(literal.name)
+    # pos = set()
+    # neg = set()
+    # for literal in list_of_literals:
+    #     if literal.is_false:
+    #         neg.add(literal.name)
+    #     else:
+    #         pos.add(literal.name)
 
+    # for i in pos:
+    #     KB[i].setdefault('positive', []).append(obj_sentence)
     
+    # for i in neg:
+    #     KB[i].setdefault('negative', []).append(obj_sentence)
 
-
-    for i in pos:
-        KB[i].setdefault('positive', []).append(obj_sentence)
-    
-    for i in neg:
-        KB[i].setdefault('negative', []).append(obj_sentence)
-    KB_list.append(obj_sentence)
+    # KB_list.append(obj_sentence)
     return obj_sentence
+
+
 
 def parse_sentence_tester():
 
@@ -249,10 +267,15 @@ def parse_sentence_tester():
     print(obj_sentence1)
 
     print("---->><<----")
+    unify(obj_sentence1, obj_sentence)
 
+
+def unify(obj_sentence1, obj_sentence2):
+    print("Testing: ", obj_sentence1, "<->", obj_sentence2)
+    new_goals = []
     all_resolutions = []
     for item1 in obj_sentence1.list_of_literals:
-        for item2 in obj_sentence.list_of_literals:
+        for item2 in obj_sentence2.list_of_literals:
             if item1.name == item2.name and item1.is_false != item2.is_false:
                 theta = {}
                 can_resolve_without_theta = True
@@ -266,14 +289,15 @@ def parse_sentence_tester():
                         theta[i2] = i1
                     elif (not i1[0].isupper() and i2[0].isupper()):
                         theta[i1]  = i2
-                    else:
+                    elif (not i1[0].isupper() and not i2[0].isupper()):
                         #TODO
                         # can variables be unified?
-                        pass
+                        theta[i1]  = i2
+                        # pass
                 
                 if can_resolve_without_theta or theta:
                     temp_i1 = [x for x in obj_sentence1.list_of_literals if x!=item1]
-                    temp_i2 = [x for x in obj_sentence.list_of_literals if x != item2]
+                    temp_i2 = [x for x in obj_sentence2.list_of_literals if x != item2]
                     temp_i = temp_i1+temp_i2
 
                     if can_resolve_without_theta:
@@ -294,42 +318,88 @@ def parse_sentence_tester():
                                     # new_i.args[j for x in new_i.args if x==i]
                         print("************** after substn **************")
                         print("Theta is : ", theta, "\n  *** removed clauses- ", item1, item2)
-                    temp_i = generate_sentence_from_list(temp_i)                
+                    temp_i = generate_sentence_from_list(temp_i)
+                    
+                    if temp_i.list_of_literals == []:
+                        print("^^^^^^^^^^^^^^^^^^^^^^^ CONTRADICTION FOUND ^^^^^^^^^^^^^^^^^^^^^^^")
+                        return False, []
+
                     print("---> NEW GOAL: ", temp_i)
+                    new_goals.append(temp_i)
                         
-                else:
-                    print("Can't unify on: ", item1, item2)
+                # else:
+                #     print("Can't unify on: ", item1, item2)
+            else:
+                "Can't unify Sentences"
     
     # print(all_resolutions)
+    return True, new_goals
+
+def unify_tester():
+    sent = "Alert(x,VitE))"
+    data = parse_sentence(sent)
+    obj_sentence1 = generate_sentence_from_list(data['list_of_literals'])
+
+    sent1 = "~Alert(Alice,VitE)"
+    data = parse_sentence(sent1)
+    obj_sentence2 = generate_sentence_from_list(data['list_of_literals'])
+    print(unify(obj_sentence1, obj_sentence2))
 
 
-def resolution_without_theta(literals):
-    # To remove HighBP(Tim, John) and ~HignBP(Tim, John)
-    # HighBP(Tim,John) | ~Take(Alice,Warfarin) | ~HighBP(z,Jkon) | ~HighBP(Tim,John)
-    remove_items_idx = set()
-    for i in range(len(literals)-1):
-        for j in range(i+1, len(literals)):
-            if (literals[i].name == literals[j].name) and (literals[i].is_false != literals[j].is_false):
-                if literals[i].args == literals[j].args:
-                    remove_items_idx.add(i)
-                    remove_items_idx.add(j)
-    
-    literals = [x for idx, x in enumerate(literals) if idx not in remove_items_idx]
-    return literals
+# unify_tester()
 
 
+# def give_all_possible_sentences_from_kb(Sentence, )
+
+
+def backtracking(m_kb, goal, depth = 0):
+    if depth > max_recursion_depth_limit - 20:
+        return True
+    for sentence in m_kb:
+        result, new_goals = unify(goal, sentence)
+        if result:
+            for new_goal in new_goals:
+                return backtracking(m_kb + [goal], new_goal, depth=depth+1)
+        else:
+            return False
+    return True
+
+
+def negate_query(m_query):
+    if m_query[0] == "~":
+        m_query = m_query[1:]
+    else:
+        m_query = "~"+m_query
+    return m_query
 
 
 def process_kb(knowledge_base):
     for sent in knowledge_base:
         data = parse_sentence(sent)
-        generate_sentence_from_list(data['list_of_literals'])
+        KB_list.append(generate_sentence_from_list(data['list_of_literals']))
 
 
-# process_kb(knowledge_base)
-parse_sentence_tester()
+process_kb(knowledge_base)
+# parse_sentence_tester()
 # print_kb(KB)
 # print_kb_list(KB_list)
 
-print(sys.getsizeof(KB))
-print(sys.getsizeof(KB_list))
+
+q = "~Alert(Alice,VitE)"
+goal_data = parse_sentence(q)
+goal = generate_sentence_from_list(goal_data['list_of_literals'])
+
+
+print(not backtracking(KB_list, goal))
+
+# print(sys.getsizeof(KB))
+# print(sys.getsizeof(KB_list))
+
+answer = []
+for query in queries:
+    neg_query = negate_query(query)
+    print(neg_query)
+    goal = generate_sentence_from_list(parse_sentence(neg_query)['list_of_literals'])
+    answer.append(not backtracking(KB_list, goal))
+
+print(answer)
