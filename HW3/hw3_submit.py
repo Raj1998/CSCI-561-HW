@@ -122,21 +122,16 @@ def print_kb(KB):
     for key, val in KB.items():
         print(f"\"{key}\"")
         print("\t+ve")
-        
         for s in val['positive']:
             print("\t  "+str(s))
-            pass
         print("\t+ve")
         for s in val['negative']:
             print("\t  "+str(s))
-            pass
-        
-        pass
+
 
 def print_kb_list(KB_list):
     for i in KB_list:
         print(i)
-        pass
 
 def parse_sentence(m_sentence):
     # sentence must be in CNF, else it wont work

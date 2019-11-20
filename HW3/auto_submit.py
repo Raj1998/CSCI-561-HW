@@ -2,7 +2,7 @@ from collections import defaultdict, namedtuple
 from itertools import count
 import sys
 
-with open('input3.txt', 'r') as f:
+with open('input.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -54,9 +54,9 @@ def remove_implication_tester():
     clause = "~Take(x,Warfarin) & Take(x,Timolol) => Alert(x,VitE)"
     # clause = "~Take(x,Warfarin)"
     # clause = "Take(x,Timolol) => Alert(x,VitE)"
-    print("Before - " + clause)
+#    print("Before - " + clause)
     clause = remove_implication(clause)
-    print("After - " + clause)
+#    print("After - " + clause)
 
 # remove_implication_tester()
 
@@ -120,22 +120,22 @@ class Sentence:
 
 def print_kb(KB):
     for key, val in KB.items():
-        print(f"\"{key}\"")
-        print("\t+ve")
+#        print(f"\"{key}\"")
+#        print("\t+ve")
         
         for s in val['positive']:
-            print("\t  "+str(s))
+#            print("\t  "+str(s))
             pass
-        print("\t+ve")
+#        print("\t+ve")
         for s in val['negative']:
-            print("\t  "+str(s))
+#            print("\t  "+str(s))
             pass
         
         pass
 
 def print_kb_list(KB_list):
     for i in KB_list:
-        print(i)
+#        print(i)
         pass
 
 def parse_sentence(m_sentence):
@@ -255,8 +255,8 @@ def parse_sentence_tester():
     #     KB[i].setdefault('positive', []).append(obj_sentence)
     # for i in data['negative_predicates']:
     #     KB[i].setdefault('negative', []).append(obj_sentence)
-    print("Obj sent---")
-    print(obj_sentence)
+#    print("Obj sent---")
+#    print(obj_sentence)
 
     sent1 = "Migraine(Bob) | ~Alert(Alice,VitE) | HighBP(Tim,John) | Make(r,Car)"
     # sent1 = "~Alert(Abc,y) | Take(y,x)"
@@ -268,15 +268,15 @@ def parse_sentence_tester():
     #     KB[i].setdefault('positive', []).append(obj_sentence1)
     # for i in data['negative_predicates']:
     #     KB[i].setdefault('negative', []).append(obj_sentence1)
-    print("Obj sent 1---")
-    print(obj_sentence1)
+#    print("Obj sent 1---")
+#    print(obj_sentence1)
 
-    print("---->><<----")
+#    print("---->><<----")
     unify(obj_sentence1, obj_sentence)
 
 
 def unify(obj_sentence1, obj_sentence2):
-    print("Testing: ", obj_sentence1, "<->", obj_sentence2)
+#    print("Testing: ", obj_sentence1, "<->", obj_sentence2)
     new_goals = []
     all_resolutions = []
     for item1 in obj_sentence1.list_of_literals:
@@ -306,10 +306,10 @@ def unify(obj_sentence1, obj_sentence2):
                     temp_i = temp_i1+temp_i2
 
                     if can_resolve_without_theta:
-                        print(")))) ", item1, "---- ", item2)
-                        print(">>>>> Before: ",temp_i)
+#                        print(")))) ", item1, "---- ", item2)
+#                        print(">>>>> Before: ",temp_i)
                         temp_i = resolution_without_theta(temp_i)
-                        print(">>>>> After: ",temp_i)
+#                        print(">>>>> After: ",temp_i)
 
                     if theta:
                         # print(temp_i)
@@ -321,15 +321,15 @@ def unify(obj_sentence1, obj_sentence2):
                                     if arg == i:
                                         new_i.args[idx] = j
                                     # new_i.args[j for x in new_i.args if x==i]
-                        print("************** after substn **************")
-                        print("Theta is : ", theta, "\n  *** removed clauses- ", item1, item2)
+#                        print("************** after substn **************")
+#                        print("Theta is : ", theta, "\n  *** removed clauses- ", item1, item2)
                     temp_i = generate_sentence_from_list(temp_i)
                     
                     if temp_i.list_of_literals == []:
-                        print("^^^^^^^^^^^^^^^^^^^^^^^ CONTRADICTION FOUND ^^^^^^^^^^^^^^^^^^^^^^^")
+#                        print("^^^^^^^^^^^^^^^^^^^^^^^ CONTRADICTION FOUND ^^^^^^^^^^^^^^^^^^^^^^^")
                         return False, []
 
-                    print("---> NEW GOAL: ", temp_i)
+#                    print("---> NEW GOAL: ", temp_i)
                     new_goals.append(temp_i)
                         
                 # else:
@@ -348,7 +348,7 @@ def unify_tester():
     sent1 = "~Alert(Alice,VitE)"
     data = parse_sentence(sent1)
     obj_sentence2 = generate_sentence_from_list(data['list_of_literals'])
-    print(unify(obj_sentence1, obj_sentence2))
+#    print(unify(obj_sentence1, obj_sentence2))
 
 
 # unify_tester()
@@ -395,7 +395,7 @@ goal_data = parse_sentence(q)
 goal = generate_sentence_from_list(goal_data['list_of_literals'])
 
 
-print(not backtracking(KB_list, goal))
+#print(not backtracking(KB_list, goal))
 
 # print(sys.getsizeof(KB))
 # print(sys.getsizeof(KB_list))
@@ -405,12 +405,12 @@ for query in queries:
     KB_list = []
     process_kb(knowledge_base, KB_list)
     neg_query = negate_query(query)
-    print(neg_query)
+#    print(neg_query)
     goal = generate_sentence_from_list(parse_sentence(neg_query)['list_of_literals'])
     answer.append(not backtracking(KB_list, goal))
 
 
-print(answer)
+#print(answer)
 
 with open('output.txt', 'w') as op_file:
     for idx, ans in enumerate(answer):
