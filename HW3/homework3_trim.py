@@ -1,11 +1,11 @@
-from collections import defaultdict, namedtuple
+from collections import defaultdict, namedtuple, deque
 from itertools import count
 import sys
 import random
 import copy
 import time
 
-with open('input7.txt', 'r') as f:
+with open('input3.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -118,8 +118,8 @@ class Sentence:
         return ' | '.join(sentence_str)
         # return f"{self.raw_sentence} \n{self.positive_predicates} \n{self.negative_predicates} \n{self.variables} \n{self.constants} \n{self.list_of_literals}"
     
-    # def __repr__(self):
-    #     return f"{self.raw_sentence}"
+    def __repr__(self):
+        return self.__str__()
 
 
 def print_kb(KB):
@@ -300,7 +300,10 @@ def unify(obj_sentence1, obj_sentence2):
                         theta[i1]  = i2
                     elif (not i1[0].isupper() and not i2[0].isupper()):
                         #TODO
+                        # 
                         # can variables be unified?
+                        # if i1 in theta -> and i2 not in theta -> theta[i2] = i1
+                        # same for if i1 in theta and theta[i1] != i2 -> cant unify... !!????
                         theta[i1]  = i2
                         pass
                 
@@ -327,8 +330,8 @@ def unify(obj_sentence1, obj_sentence2):
                                     if arg == i:
                                         new_i.args[idx] = j
                                     # new_i.args[j for x in new_i.args if x==i]
-                        # print("************** after substn **************")
-                        # print("Theta is : ", theta, "\n  *** removed clauses- ", item1, item2)
+                        print("************** after substn **************")
+                        print("Theta is : ", theta, "\n  *** removed clauses- ", item1, item2)
                     temp_i = generate_sentence_from_list(temp_i)
                     
                     if temp_i.list_of_literals == []:
@@ -347,18 +350,20 @@ def unify(obj_sentence1, obj_sentence2):
     return True, new_goals
 
 def unify_tester():
-    sent = "Alert(x,VitE))"
+    # sent = "Alert(x,VitE))"
     # sent = "~B(Bob, y) | ~C(Bob, y)"
+    sent = "Predicate(x,x) | A(Ram)"
     data = parse_sentence(sent)
     obj_sentence1 = generate_sentence_from_list(data['list_of_literals'])
 
-    sent1 = "~Alert(Alice,VitE)"
+    # sent1 = "~Alert(Alice,VitE)"
+    sent1 = "~Predicate(y,z) | B(Shyam)"
     data = parse_sentence(sent1)
     obj_sentence2 = generate_sentence_from_list(data['list_of_literals'])
     print(unify(obj_sentence1, obj_sentence2))
 
 
-# unify_tester()
+unify_tester()
 
 
 # def give_all_possible_sentences_from_kb(Sentence, )
@@ -393,6 +398,35 @@ def backtracking(m_kb, goal, seen_goals, depth = 0):
     return False
 
 
+def bfs(m_kb, goal, seen_goals):
+    q = deque()
+    q.append(goal)
+
+    while q:
+        curr_goal = q.popleft()
+        print(q)
+        # input()
+
+        for sentence in m_kb:
+            result, new_goals = unify(curr_goal, sentence)
+            if not result:
+                return True
+            elif result:
+                for new_goal in new_goals:
+                    
+                    if new_goal.__str__() not in seen_goals:
+                        m_kb.append(new_goal)
+                        q.append(new_goal)
+                        
+                    # can_resolve = backtracking(new_kb, new_goal, seen_goals, depth=depth+1)
+                    # seen_goals.add(new_goal.__str__())
+                    # print("BACKTRACKING----")
+                    # if can_resolve:
+                    #     return True
+    
+    return False
+
+
 def negate_query(m_query):
     if m_query[0] == "~":
         m_query = m_query[1:]
@@ -423,6 +457,33 @@ def process_kb(knowledge_base, m_kb_list):
 # print(sys.getsizeof(KB))
 # print(sys.getsizeof(KB_list))
 
+# def single_tester():
+#     KB_list = []
+#     query = "Ancestor(Liz,Bob)"
+#     neg_query = negate_query(query)
+#     print("Negated query = ", neg_query)
+#     goal = generate_sentence_from_list(parse_sentence(neg_query)['list_of_literals'])
+    
+#     process_kb(knowledge_base, KB_list)
+#     KB_list.append(goal)
+#     print_kb_list(KB_list)
+
+#     random.shuffle(KB_list)
+
+#     for i in range(len(KB_list)-1):
+#         for j in range(i+1, len(KB_list)):
+#             can, all = unify(KB_list[i], KB_list[j])
+#             if can and all:
+#                 goal = all[0]
+#                 break
+#     print('ne', goal)
+#     # input()
+#     seen_goals = set()
+#     seen_goals.add(goal.__str__())
+#     print(backtracking(KB_list, goal, seen_goals))
+
+# single_tester()
+
 answer = []
 for query in queries:
     KB_list = []
@@ -434,6 +495,7 @@ for query in queries:
     seen_goals = set()
     seen_goals.add(goal.__str__())
     answer.append(backtracking(KB_list, goal, seen_goals))
+    # answer.append(bfs(KB_list, goal, seen_goals))
 
 
 print(answer)

@@ -1,5 +1,4 @@
-2
-Ancestor(Liz,Bob)
+1
 Ancestor(Liz,Billy)
 6
 Parent(x,y) & Ancestor(y,z) => Ancestor(x,z)
