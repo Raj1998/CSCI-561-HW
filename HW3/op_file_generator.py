@@ -1,4 +1,4 @@
-with open('homework3.py', 'r') as fr:
+with open('homework3_trim.py', 'r') as fr:
     with open('auto_submit.py', 'w') as fo:
         line = fr.readline()
         while line:
