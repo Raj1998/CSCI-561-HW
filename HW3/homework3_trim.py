@@ -1,8 +1,11 @@
 from collections import defaultdict, namedtuple
 from itertools import count
 import sys
+import random
+import copy
+import time
 
-with open('input3.txt', 'r') as f:
+with open('input4.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -31,12 +34,12 @@ def is_var(m_string):
     return m_string[0].islower()
 
 def remove_implication(m_clause):
-    if " => " in m_clause:
-        m_clause_split = m_clause.split(" => ")
+    if "=>" in m_clause:
+        m_clause_split = [x.strip() for x in m_clause.split("=>")]
         m_clause_premise = m_clause_split[0]
         m_clause_conclusion = m_clause_split[1]
 
-        premise_split = m_clause_premise.split(" & ")
+        premise_split = [x.strip() for x in m_clause_premise.split("&")]
 
         for idx, i in enumerate(premise_split):
             if i[0] == "~":
@@ -44,8 +47,8 @@ def remove_implication(m_clause):
             else:
                 premise_split[idx] = "~"+i
 
-        m_clause_premise = " | ".join(premise_split)
-        m_clause = m_clause_premise + " | " + m_clause_conclusion
+        m_clause_premise = "|".join(premise_split)
+        m_clause = m_clause_premise + "|" + m_clause_conclusion
         return m_clause
     else:
         return m_clause
@@ -66,10 +69,11 @@ knowledge_base = list(map(remove_implication, knowledge_base))
 # for i in knowledge_base:
 #     print(i)
 
-KB_list = []
+# KB_list = []
 KB = defaultdict(lambda: defaultdict(dict))
 class Literal(namedtuple("Literal", ["name", "is_false", "args"])):
     def __str__(self):
+        # args_to_show = [x if not is_var(x) else 'v' for x in self.args]
         single_l = ""
         if self.is_false:
             single_l+="~"
@@ -154,7 +158,7 @@ def parse_sentence(m_sentence):
     # negative_predicates = parsed_data['negative_predicates']
     list_of_literals = parsed_data['list_of_literals']
 
-    atomic_sentences = m_sentence.split(' | ')
+    atomic_sentences = m_sentence.split('|')
 
     for atomic in atomic_sentences:
         curr = atomic if atomic[0] != "~" else atomic[1:]
@@ -207,7 +211,6 @@ def resolution_without_theta(literals):
 
 
 def generate_sentence_from_list(list_of_literals):
-    
     temp_dict = {}
     for literal in list_of_literals:
         for var in literal.args:
@@ -299,11 +302,13 @@ def unify(obj_sentence1, obj_sentence2):
                         #TODO
                         # can variables be unified?
                         theta[i1]  = i2
-                        # pass
+                        pass
                 
                 if can_resolve_without_theta or theta:
-                    temp_i1 = [x for x in obj_sentence1.list_of_literals if x!=item1]
-                    temp_i2 = [x for x in obj_sentence2.list_of_literals if x != item2]
+                    temp_sent1 = copy.deepcopy(obj_sentence1)
+                    temp_i1 = [x for x in temp_sent1.list_of_literals if x!=item1]
+                    temp_sent2 = copy.deepcopy(obj_sentence2)
+                    temp_i2 = [x for x in temp_sent2.list_of_literals if x != item2]
                     temp_i = temp_i1+temp_i2
 
                     if can_resolve_without_theta:
@@ -322,8 +327,8 @@ def unify(obj_sentence1, obj_sentence2):
                                     if arg == i:
                                         new_i.args[idx] = j
                                     # new_i.args[j for x in new_i.args if x==i]
-                        print("************** after substn **************")
-                        print("Theta is : ", theta, "\n  *** removed clauses- ", item1, item2)
+                        # print("************** after substn **************")
+                        # print("Theta is : ", theta, "\n  *** removed clauses- ", item1, item2)
                     temp_i = generate_sentence_from_list(temp_i)
                     
                     if temp_i.list_of_literals == []:
@@ -359,17 +364,33 @@ def unify_tester():
 # def give_all_possible_sentences_from_kb(Sentence, )
 
 
-def backtracking(m_kb, goal, depth = 0):
-    if depth > max_recursion_depth_limit - 20:
-        return True
+def backtracking(m_kb, goal, seen_goals, depth = 0):
+    # input()
+    # random.shuffle(m_kb)
+    print(depth)
+    if depth > max_recursion_depth_limit - 50:
+        print("Depth limit !!!")
+        return False
     for sentence in m_kb:
         result, new_goals = unify(goal, sentence)
-        if result:
+        if not result:
+            return True
+        elif result:
             for new_goal in new_goals:
-                return backtracking(m_kb + [goal], new_goal, depth=depth+1)
-        else:
-            return False
-    return True
+                new_kb = m_kb + [goal]
+                # random.shuffle(new_kb)
+                if new_goal.__str__() in seen_goals:
+                    continue
+                can_resolve = backtracking(new_kb, new_goal, seen_goals, depth=depth+1)
+                seen_goals.add(new_goal.__str__())
+                print("BACKTRACKING----")
+                if can_resolve:
+                    return True
+        # else:
+        #     return True
+    
+    
+    return False
 
 
 def negate_query(m_query):
@@ -408,9 +429,11 @@ for query in queries:
     process_kb(knowledge_base, KB_list)
     print_kb_list(KB_list)
     neg_query = negate_query(query)
-    print(neg_query)
+    print("Negated query = ", neg_query)
     goal = generate_sentence_from_list(parse_sentence(neg_query)['list_of_literals'])
-    answer.append(not backtracking(KB_list, goal))
+    seen_goals = set()
+    seen_goals.add(goal.__str__())
+    answer.append(backtracking(KB_list, goal, seen_goals))
 
 
 print(answer)
