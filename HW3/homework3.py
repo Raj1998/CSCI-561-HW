@@ -2,7 +2,7 @@ from collections import defaultdict, namedtuple
 from itertools import count
 import sys
 
-with open('input3.txt', 'r') as f:
+with open('input5.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:

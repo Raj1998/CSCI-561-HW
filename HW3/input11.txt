@@ -1,0 +1,6 @@
+1
+FG(Bob)
+3
+AGG(x,y,John) => FG(y)
+AG(x) => AGG(x,y,x)
+AG(John)

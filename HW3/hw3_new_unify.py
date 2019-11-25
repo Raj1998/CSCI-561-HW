@@ -5,15 +5,7 @@ import random
 import copy
 import time
 
-
-
-if len(sys.argv) == 1:
-    file_name = 'input7.txt'
-else:
-    file_name = sys.argv[1]
-# print(file_name)
-
-with open(file_name, 'r') as f:
+with open('input4.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -65,9 +57,9 @@ def remove_implication_tester():
     clause = "~Take(x,Warfarin) & Take(x,Timolol) => Alert(x,VitE)"
     # clause = "~Take(x,Warfarin)"
     # clause = "Take(x,Timolol) => Alert(x,VitE)"
-#    print("Before - " + clause)
+    print("Before - " + clause)
     clause = remove_implication(clause)
-#    print("After - " + clause)
+    print("After - " + clause)
 
 # remove_implication_tester()
 
@@ -132,22 +124,22 @@ class Sentence:
 
 def print_kb(KB):
     for key, val in KB.items():
-#        print(f"\"{key}\"")
-#        print("\t+ve")
+        print(f"\"{key}\"")
+        print("\t+ve")
         
         for s in val['positive']:
-#            print("\t  "+str(s))
+            print("\t  "+str(s))
             pass
-#        print("\t+ve")
+        print("\t+ve")
         for s in val['negative']:
-#            print("\t  "+str(s))
+            print("\t  "+str(s))
             pass
         
         pass
 
 def print_kb_list(KB_list):
     for i in KB_list:
-#        print(i)
+        print(i)
         pass
 
 def parse_sentence(m_sentence):
@@ -214,8 +206,11 @@ def resolution_without_theta(literals):
                     remove_items_idx.add(i)
                     remove_items_idx.add(j)
     
-    literals = [x for idx, x in enumerate(literals) if idx not in remove_items_idx]
-    return literals
+    if not remove_items_idx:
+        return False, literals
+    else:
+        literals = [x for idx, x in enumerate(literals) if idx not in remove_items_idx]
+        return True, literals
 
 
 def generate_sentence_from_list(list_of_literals):
@@ -266,8 +261,8 @@ def parse_sentence_tester():
     #     KB[i].setdefault('positive', []).append(obj_sentence)
     # for i in data['negative_predicates']:
     #     KB[i].setdefault('negative', []).append(obj_sentence)
-#    print("Obj sent---")
-#    print(obj_sentence)
+    print("Obj sent---")
+    print(obj_sentence)
 
     sent1 = "Migraine(Bob) | ~Alert(Alice,VitE) | HighBP(Tim,John) | Make(r,Car)"
     # sent1 = "~Alert(Abc,y) | Take(y,x)"
@@ -279,108 +274,53 @@ def parse_sentence_tester():
     #     KB[i].setdefault('positive', []).append(obj_sentence1)
     # for i in data['negative_predicates']:
     #     KB[i].setdefault('negative', []).append(obj_sentence1)
-#    print("Obj sent 1---")
-#    print(obj_sentence1)
+    print("Obj sent 1---")
+    print(obj_sentence1)
 
-#    print("---->><<----")
+    print("---->><<----")
     unify(obj_sentence1, obj_sentence)
 
 
-def unify2(obj_sentence1, obj_sentence2):
-#    print("Testing: ", obj_sentence1, "<->", obj_sentence2)
-    # input()
-    new_goals = []
-    # all_resolutions = []
+def make_substitution(obj_sentence1, obj_sentence2, theta, visited1, visited2):
+    # filter tempi1, tempi2
+    # temp i = temp1 + temp2 then do substin
 
-    visited1 = set()
-    visited2 = set()
-    pairs = set()
+    temp_sent1 = copy.deepcopy(obj_sentence1)
+    temp_sent2 = copy.deepcopy(obj_sentence2)
 
-    # for idx1, item1 in enumerate(obj_sentence1.list_of_literals):
-    idx1 = 0
-    item1 = obj_sentence1.list_of_literals[0]
-    for idx2, item2 in enumerate(obj_sentence2.list_of_literals):
-        if item1.name == item2.name and item1.is_false != item2.is_false:
-            
-            theta = {}
-            can_resolve_without_theta = True
-            
-            for i1, i2 in zip(item1.args, item2.args):
-                if (i1[0].isupper() and i2[0].isupper()) and (i1 != i2):
-                    theta = {}
-                    can_resolve_without_theta = False
-                    break
-                elif (i1[0].isupper() and i2[0].isupper()) and (i1 == i2):
-                    theta[i1] = i2
-                elif (i1[0].isupper() and not i2[0].isupper()):
-                    theta[i2] = i1
-                elif (not i1[0].isupper() and i2[0].isupper()):
-                    theta[i1]  = i2
-                elif (not i1[0].isupper() and not i2[0].isupper()):
-                    #TODO
-                    # 
-                    # can variables be unified?
-                    # if i1 in theta -> and i2 not in theta -> theta[i2] = i1
-                    # same for if i1 in theta and theta[i1] != i2 -> cant unify... !!????
-                    theta[i1]  = i2
-                    pass
-            
-            if can_resolve_without_theta or theta:
-                temp_sent1 = copy.deepcopy(obj_sentence1)
-                temp_i1 = [x for x in temp_sent1.list_of_literals if x!=item1]
-                temp_sent2 = copy.deepcopy(obj_sentence2)
-                temp_i2 = [x for x in temp_sent2.list_of_literals if x != item2]
-                temp_i = temp_i1+temp_i2
-
-                if can_resolve_without_theta:
-                    # print(")))) ", item1, "---- ", item2)
-                    # print(">>>>> Before: ",temp_i)
-                    # temp_i = resolution_without_theta(temp_i)
-                    pass
-                    # print(">>>>> After: ",temp_i)
-
-                if theta:
-                    # print(temp_i)
-                    # all_resolutions.append(theta)
-                    visited1.add(idx1)
-                    visited2.add(idx2)
-
-                    for i, j in theta.items():
-                        for new_i in temp_i:
-                            for idx, arg in enumerate(new_i.args):
-                                if arg == i:
-                                    new_i.args[idx] = j
-                                # new_i.args[j for x in new_i.args if x==i]
-#                    print("************** after substn **************")
-#                    print("Theta is : ", theta, "\n  *** removed clauses- ", item1, item2)
-                
-                # temp_i = resolution_without_theta(temp_i)
-
-
-
-                temp_i = generate_sentence_from_list(temp_i)
-                
-                if temp_i.list_of_literals == []:
-#                    print("^^^^^^^^^^^^^^^^^^^^^^^ CONTRADICTION FOUND ^^^^^^^^^^^^^^^^^^^^^^^")
-                    return False, []
-
-#                print("---> NEW GOAL: ", temp_i)
-                new_goals.append(temp_i)
-                        
-                # else:
-                #     print("Can't unify on: ", item1, item2)
-            # else:
-            #     print("Can't unify Sentences")
+    temp_i1 = temp_sent1.list_of_literals
+    temp_i2 = temp_sent2.list_of_literals
+    temp_i = temp_i1 + temp_i2
     
-    # print(all_resolutions)
-    # if len(new_goals) > 1:
-    #     print("============ Lannnnnnnnnnnnn", len(new_goals))
-    return True, new_goals
+    if theta:
+        for i, j in theta.items():
+            for new_i in temp_i:
+                for idx, arg in enumerate(new_i.args):
+                    if arg == i:
+                        new_i.args[idx] = j
+        _, temp_i = resolution_without_theta(temp_i)
 
+        if temp_i == []:
+            print("^^^^^^^^^^^^^^^^^^^^^^^ CONTRADICTION FOUND ^^^^^^^^^^^^^^^^^^^^^^^")
+            return False, []
+        else:
+            merged_sentence = generate_sentence_from_list(temp_i)
+            return True, [merged_sentence]
+    else:
+        can_do_without_theta, temp_i = resolution_without_theta(temp_i)
+        if temp_i == []:
+            print("^^^^^^^^^^^^^^^^^^^^^^^ CONTRADICTION FOUND ^^^^^^^^^^^^^^^^^^^^^^^")
+            return False, []
+        else:
+            if can_do_without_theta:
+                merged_sentence = generate_sentence_from_list(temp_i)
+                return True, [merged_sentence]
+            else:
+                return True, []
 
 
 def unify(obj_sentence1, obj_sentence2):
-#    print("Testing: ", obj_sentence1, "<->", obj_sentence2)
+    print("Testing: ", obj_sentence1, "<->", obj_sentence2)
     # input()
     new_goals = []
     # all_resolutions = []
@@ -389,157 +329,95 @@ def unify(obj_sentence1, obj_sentence2):
     visited2 = set()
     pairs = set()
 
+    theta = {}
     for idx1, item1 in enumerate(obj_sentence1.list_of_literals):
         for idx2, item2 in enumerate(obj_sentence2.list_of_literals):
-            if item1.name == item2.name and item1.is_false != item2.is_false:
+            # print("]]",item1, item2)
+            if idx1 not in visited1 and idx2 not in visited2 and item1.name == item2.name and item1.is_false != item2.is_false:
                 
-                theta = {}
-                can_resolve_without_theta = True
-                
+                # can_resolve_without_theta = True
+                constants_missmatch = False
+                temp_theta = {}
+
                 for i1, i2 in zip(item1.args, item2.args):
                     if (i1[0].isupper() and i2[0].isupper()) and (i1 != i2):
-                        theta = {}
-                        can_resolve_without_theta = False
+                        constants_missmatch = True
+                        # can_resolve_without_theta = False
                         break
                     elif (i1[0].isupper() and not i2[0].isupper()):
-                        theta[i2] = i1
+                        temp_theta[i2] = i1
                     elif (not i1[0].isupper() and i2[0].isupper()):
-                        theta[i1]  = i2
+                        temp_theta[i1]  = i2
                     elif (not i1[0].isupper() and not i2[0].isupper()):
                         #TODO
                         # 
                         # can variables be unified?
                         # if i1 in theta -> and i2 not in theta -> theta[i2] = i1
                         # same for if i1 in theta and theta[i1] != i2 -> cant unify... !!????
-                        theta[i1]  = i2
+                        temp_theta[i1]  = i2
                         pass
                 
-                if can_resolve_without_theta or theta:
-                    temp_sent1 = copy.deepcopy(obj_sentence1)
-                    temp_i1 = [x for x in temp_sent1.list_of_literals if x!=item1]
-                    temp_sent2 = copy.deepcopy(obj_sentence2)
-                    temp_i2 = [x for x in temp_sent2.list_of_literals if x != item2]
-                    temp_i = temp_i1+temp_i2
-
-                    if can_resolve_without_theta:
-                        # print(")))) ", item1, "---- ", item2)
-                        # print(">>>>> Before: ",temp_i)
-                        temp_i = resolution_without_theta(temp_i)
-                        # print(">>>>> After: ",temp_i)
-
-                    if theta:
-                        # print(temp_i)
-                        # all_resolutions.append(theta)
-                        visited1.add(idx1)
-                        visited2.add(idx2)
-
-                        for i, j in theta.items():
-                            for new_i in temp_i:
-                                for idx, arg in enumerate(new_i.args):
-                                    if arg == i:
-                                        new_i.args[idx] = j
-                                    # new_i.args[j for x in new_i.args if x==i]
-#                        print("************** after substn **************")
-#                        print("Theta is : ", theta, "\n  *** removed clauses- ", item1, item2)
+                if not constants_missmatch:
+                    visited1.add(idx1)
+                    visited2.add(idx2)
+                    theta.update(temp_theta)
                     
-                    temp_i = resolution_without_theta(temp_i)
 
-
-
-                    temp_i = generate_sentence_from_list(temp_i)
                     
-                    if temp_i.list_of_literals == []:
-#                        print("^^^^^^^^^^^^^^^^^^^^^^^ CONTRADICTION FOUND ^^^^^^^^^^^^^^^^^^^^^^^")
-                        return False, []
-
-#                    print("---> NEW GOAL: ", temp_i)
-                    new_goals.append(temp_i)
                         
                 # else:
                 #     print("Can't unify on: ", item1, item2)
             # else:
             #     print("Can't unify Sentences")
-    
-    # print(all_resolutions)
-    if len(new_goals) > 1:
-#        print("============ Lannnnnnnnnnnnn", len(new_goals))
-        pass
-    return True, new_goals
+    result, merged_sentence = make_substitution(obj_sentence1, obj_sentence2, theta, visited1, visited2)
+    if merged_sentence:
+        print("---> NEW GOAL: ", merged_sentence)
+    return result, merged_sentence
+    # if merged_sentence.list_of_literals == []:
+    #     print("^^^^^^^^^^^^^^^^^^^^^^^ CONTRADICTION FOUND ^^^^^^^^^^^^^^^^^^^^^^^")
+    #     return False, []
+    # print("---> NEW GOAL: ", merged_sentence)
+    # # print(all_resolutions)
+    # return True, [merged_sentence]
 
 def unify_tester():
-    # sent = "Alert(x,VitE))"
-    # sent = "~B(Bob, y) | ~C(Bob, y)"
+    # sent1 = "Alert(x,VitE))"
+    # sent1 = "~B(Bob, y) | ~C(Bob, y)"
     # sent = "Predicate(x,x) | A(Ram)"
-    # sent1 = "P(v_0)|P(v_1)"
-    sent1 = "~HighBP(Tim,John)|Alert(x,VitE)|~HighBP(Tim,Jkon)"
+    sent1 = "P(v_0)|P(v_1)"
     data = parse_sentence(sent1)
     obj_sentence1 = generate_sentence_from_list(data['list_of_literals'])
 
     # sent2 = "~Alert(Alice,VitE)"
     # sent2 = "~Predicate(y,z) | B(Shyam)"
-    # sent2 = "~P(v_3)|~P(v_4)|T(v_5)"
-    sent2 = "Migraine(Bob)|Alert(Alice,VitE)|HighBP(Tim,John)|Make(r,Car)"
+    sent2 = "~P(v_3)|~P(v_4)|T(v_5)"
     data = parse_sentence(sent2)
     obj_sentence2 = generate_sentence_from_list(data['list_of_literals'])
     
-#    print(unify2(obj_sentence1, obj_sentence2))
+    print(unify(obj_sentence1, obj_sentence2))
 
 
-# unify_tester()
+unify_tester()
 
 
 # def give_all_possible_sentences_from_kb(Sentence, )
 
 
-def backtracking(m_kb, goal, seen_goals, last_resolved_with, no_of_clauses, depth = 0):
-    # input()
-    # random.shuffle(m_kb)
-#    print(depth)
-    if depth > max_recursion_depth_limit - 50:
-#        print("Depth limit !!!")
-        return False
-    for sentence in m_kb:
-        result, new_goals = unify2(goal, sentence)
-        
-        if not result:
-            return True
-        elif result:
-            
-            for new_goal in new_goals:
-                new_kb = m_kb + [goal]
-                # random.shuffle(new_kb)
-                # if sentence == last_resolved_with and len(new_goal.list_of_literals) > no_of_clauses:
-                #     print("----------->>>>>>>>")
-                #     return
-                if new_goal.__str__() in seen_goals:
-                    continue
-                last_resolved_with = sentence
-                can_resolve = backtracking(new_kb, new_goal, seen_goals, last_resolved_with, len(new_goal.list_of_literals), depth=depth+1)
-                seen_goals.add(new_goal.__str__())
-#                print("BACKTRACKING----")
-                if can_resolve:
-                    return True
-        # else:
-        #     return True
-    
-    
-    return False
-
+# max_time = time.time() + 3
 
 def timeout_or_not(timeout):
     if time.time() > timeout:
         return True
 
-
-def backtracking2(m_kb, goal, seen_goals, last_resolved_with, no_of_clauses, timeout, depth = 0):
+def backtracking(m_kb, goal, seen_goals, last_resolved_with, no_of_clauses, timeout, depth = 0):
     # input()
     # random.shuffle(m_kb)
-#    print(depth)
-    if depth > max_recursion_depth_limit - 50 or timeout_or_not(timeout):
-#        print("Depth limit !!! or Timeout !!!")
+    print(depth)
+    if depth > max_recursion_depth_limit:
+        print("Depth limit !!!")
         return False, True
     for sentence in m_kb:
-        result, new_goals = unify2(goal, sentence)
+        result, new_goals = unify(goal, sentence)
         
         if not result:
             return True, False
@@ -549,16 +427,16 @@ def backtracking2(m_kb, goal, seen_goals, last_resolved_with, no_of_clauses, tim
                 new_kb = m_kb + [goal]
                 # random.shuffle(new_kb)
                 # if sentence == last_resolved_with and len(new_goal.list_of_literals) > no_of_clauses:
-                #     print("----------->>>>>>>>")
-                #     return
+                #     print("----------->>>>>>>>")                  
+                    # return
                 if new_goal.__str__() in seen_goals:
                     continue
                 last_resolved_with = sentence
-                can_resolve, did_timeout = backtracking2(new_kb, new_goal, seen_goals, last_resolved_with, len(new_goal.list_of_literals), timeout, depth=depth+1)
+                can_resolve, did_timeout = backtracking(new_kb, new_goal, seen_goals, last_resolved_with, len(new_goal.list_of_literals), timeout, depth=depth+1)
                 if did_timeout:
                     return False, True
                 seen_goals.add(new_goal.__str__())
-#                print("BACKTRACKING----")
+                print("BACKTRACKING----")
                 if can_resolve:
                     return True, False
         # else:
@@ -574,7 +452,7 @@ def bfs(m_kb, goal, seen_goals):
 
     while q:
         curr_goal = q.popleft()
-#        print(q)
+        print(q)
         # input()
 
         for sentence in m_kb:
@@ -613,7 +491,7 @@ def bfs2(m_kb, goal, seen_goals):
                 if not result: return True
                 new = new.union(set(new_goals))
             if new.issubset(m_kb):
-#                print("^^^^^^^^^^^^^^^^^^^^^subset found ^^^^^^^^^^^^^^^^^^^^^")
+                print("^^^^^^^^^^^^^^^^^^^^^subset found ^^^^^^^^^^^^^^^^^^^^^")
                 return False
         
         m_kb = m_kb.union(new)
@@ -678,23 +556,21 @@ def process_kb(knowledge_base, m_kb_list):
 # single_tester()
 
 answer = []
-for query in queries:
-    KB_list = []
-    process_kb(knowledge_base, KB_list)
-    # KB_list.sort(key=lambda x: len(x.list_of_literals))
-    print_kb_list(KB_list)
+# for query in queries:
+#     KB_list = []
+#     process_kb(knowledge_base, KB_list)
+#     KB_list.sort(key=lambda x: len(x.list_of_literals))
+#     print_kb_list(KB_list)
 
-    neg_query = negate_query(query)
-#    print("Negated query = ", neg_query)
-    goal = generate_sentence_from_list(parse_sentence(neg_query)['list_of_literals'])
-    KB_list.append(goal)
-
-    seen_goals = set()
-    seen_goals.add(goal.__str__())
-    answer.append( backtracking2(KB_list, goal, seen_goals, None, len(goal.list_of_literals), time.time()+50)[0] )
-#     # answer.append(bfs(KB_list, goal, seen_goals))
-    # answer.append(bfs2(KB_list, goal, seen_goals))
-#print(answer)
+#     neg_query = negate_query(query)
+#     print("Negated query = ", neg_query)
+#     goal = generate_sentence_from_list(parse_sentence(neg_query)['list_of_literals'])
+#     seen_goals = set()
+#     seen_goals.add(goal.__str__())
+#     answer.append(backtracking(KB_list, goal, seen_goals, None, len(goal.list_of_literals), time.time()+2)[0] )
+# #     # answer.append(bfs(KB_list, goal, seen_goals))
+#     # answer.append(bfs2(KB_list, goal, seen_goals))
+# print(answer)
 
 with open('output.txt', 'w') as op_file:
     for idx, ans in enumerate(answer):
