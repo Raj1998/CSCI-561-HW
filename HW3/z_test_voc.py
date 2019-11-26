@@ -30,14 +30,14 @@ if __name__ == "__main__":
 	#print PASS or give wrong line number
 	
 
-	for i in range(1, 8):
+	for i in range(1, 14 + 1):
 		input_file = f'input{i}.txt'
 		os.system(f'python3 auto_submit.py {input_file}')
 		result=ansCheck(f'./Truth_OP/output{i}.txt','output.txt')
 		if result:
 			print(f'Testcase {i} --- PASS')
 		else:
-			print("Faillll")
+			print(f'Testcase {i} -Failllllllllll')
 		# elif result[0]=='D':
 		# 	print('More or Less lines in the your answer')
 		# 	print(result[1])
