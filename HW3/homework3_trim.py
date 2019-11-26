@@ -1,7 +1,7 @@
 from collections import defaultdict, namedtuple, deque
 from itertools import count
 import sys
-import random
+# import random
 import copy
 import time
 
@@ -301,7 +301,7 @@ def unify2(obj_sentence1, obj_sentence2):
 
     visited1 = set()
     visited2 = set()
-    pairs = set()
+    # pairs = set()
 
     # for idx1, item1 in enumerate(obj_sentence1.list_of_literals):
     idx1 = 0
@@ -597,7 +597,7 @@ def timeout_or_not(timeout):
         return True
 
 
-def backtracking2(m_kb, goal, seen_goals, last_resolved_with, no_of_clauses, timeout, depth = 0):
+def backtracking2(m_kb, goal, seen_goals, timeout, depth = 0):
     # input()
     # random.shuffle(m_kb)
     print(depth)
@@ -619,8 +619,8 @@ def backtracking2(m_kb, goal, seen_goals, last_resolved_with, no_of_clauses, tim
                 #     return
                 if new_goal.__str__() in seen_goals:
                     continue
-                last_resolved_with = sentence
-                can_resolve, did_timeout = backtracking2(new_kb, new_goal, seen_goals, last_resolved_with, len(new_goal.list_of_literals), timeout, depth=depth+1)
+                # last_resolved_with = sentence
+                can_resolve, did_timeout = backtracking2(new_kb, new_goal, seen_goals, timeout, depth=depth+1)
                 if did_timeout:
                     return False, True
                 seen_goals.add(new_goal.__str__())
@@ -759,7 +759,7 @@ for query in queries:
 
     seen_goals = set()
     seen_goals.add(goal.__str__())
-    answer.append( backtracking2(KB_list, goal, seen_goals, None, len(goal.list_of_literals), time.time()+50)[0] )
+    answer.append( backtracking2(KB_list, goal, seen_goals, time.time()+20)[0] )
 #     # answer.append(bfs(KB_list, goal, seen_goals))
     # answer.append(bfs2(KB_list, goal, seen_goals))
 

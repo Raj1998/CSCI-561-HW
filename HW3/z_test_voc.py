@@ -30,7 +30,7 @@ if __name__ == "__main__":
 	#print PASS or give wrong line number
 	
 
-	for i in range(1, 14 + 1):
+	for i in range(1, 15 + 1):
 		input_file = f'input{i}.txt'
 		os.system(f'python3 auto_submit.py {input_file}')
 		result=ansCheck(f'./Truth_OP/output{i}.txt','output.txt')
