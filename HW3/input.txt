@@ -1,5 +1,11 @@
 1
-A(John)
-2
-A(x) => B(x)
-B(x) => A(x)
+Ancestor(Liz,Billy)
+8
+Parent(x,y) & Ancestor(y,z) => Ancestor(x,z)
+Mother(Liz,Charley)
+Father(Charley,Pik)
+Father(Pik,Gean)
+Father(Gean,Billy)
+Mother(x,y) => Parent(x,y)
+Father(x,y) => Parent(x,y)
+Parent(x,y) => Ancestor(x,y)

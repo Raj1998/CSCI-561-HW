@@ -5,7 +5,13 @@ import sys
 import copy
 import time
 
-with open('input.txt', 'r') as f:
+if len(sys.argv) == 1:
+    file_name = 'input.txt'
+else:
+    file_name = sys.argv[1]
+
+with open(file_name, 'r') as f:
+# with open('input.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:
@@ -598,6 +604,7 @@ def timeout_or_not(timeout):
 
 
 def backtracking2(m_kb, goal, seen_goals, timeout, depth = 0):
+    # m_kb.sort(key=lambda x: len(x.list_of_literals))
     # input()
     # random.shuffle(m_kb)
 #    print(depth)

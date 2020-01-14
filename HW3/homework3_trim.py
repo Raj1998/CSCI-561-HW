@@ -5,7 +5,7 @@ import sys
 import copy
 import time
 
-with open('input.txt', 'r') as f:
+with open('input8.txt', 'r') as f:
     line = f.readline()
     arr = [0]
     while line:

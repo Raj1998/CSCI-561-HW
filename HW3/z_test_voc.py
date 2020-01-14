@@ -29,15 +29,19 @@ if __name__ == "__main__":
 	#compare two output
 	#print PASS or give wrong line number
 	
-
-	for i in range(1, 15 + 1):
-		input_file = f'input{i}.txt'
+	p = 0
+	f = 0
+	for i in range(1, 50 + 1):
+		input_file = f'testcases/input_{i}.txt'
 		os.system(f'python3 auto_submit.py {input_file}')
-		result=ansCheck(f'./Truth_OP/output{i}.txt','output.txt')
+		result=ansCheck(f'./testcases/output_{i}.txt','output.txt')
 		if result:
 			print(f'Testcase {i} --- PASS')
+			p+=1
 		else:
 			print(f'Testcase {i} -Failllllllllll')
+			f+=1
+	print(p, f)
 		# elif result[0]=='D':
 		# 	print('More or Less lines in the your answer')
 		# 	print(result[1])
